@@ -6,7 +6,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { binaryType } from '../../config/db.js';
-import { Buch } from './buch.entity.js';
+import { Pflanze } from './pflanze.entity.js';
 
 @Entity()
 export class BuchFile {
@@ -19,9 +19,9 @@ export class BuchFile {
     @Column('varchar')
     mimetype: string | undefined;
 
-    @OneToOne(() => Buch, (buch) => buch.file)
+    @OneToOne(() => Buch, (buch) => pflanze.file)
     @JoinColumn({ name: 'buch_id' })
-    buch: Buch | undefined;
+    buch: Pflanze | undefined;
 
     @Column({ type: binaryType })
     data: Uint8Array | undefined;

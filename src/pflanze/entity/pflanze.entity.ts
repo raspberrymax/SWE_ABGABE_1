@@ -65,6 +65,7 @@ export class Pflanze {
         JSON.stringify({
             id: this.id,
             version: this.version,
+            name: this.name,
             typ: this.typ,
             schlagwoerter: this.schlagwoerter,
             erzeugt: this.erzeugt,
