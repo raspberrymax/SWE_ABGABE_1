@@ -1,5 +1,10 @@
+/**
+ * Das Modul besteht aus der Entity-Klasse.
+ * @packageDocumentation
+ */
+
 import { ApiProperty } from '@nestjs/swagger';
-import Decimal from 'decimal.js'; // falls du weiterhin decimal.js nutzen möchtest
+import Decimal from 'decimal.js'; // eslint-disable-line @typescript-eslint/naming-convention
 import {
     Column,
     CreateDateColumn,
@@ -11,12 +16,14 @@ import {
     VersionColumn,
 } from 'typeorm';
 import { dbType } from '../../config/db.js';
-import { DecimalTransformer } from './decimal-transformer.js';
 import { Abbildung } from './abbildung.entity.js';
 import { PflanzeFile } from './pflanzeFile.entity.js';
 
+export type PflanzeTyp 'INDOOR' | 'OUTDOOR';
+
 @Entity()
 export class Pflanze {
+    
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
@@ -24,54 +31,42 @@ export class Pflanze {
     readonly version: number | undefined;
 
     @Column()
-    @ApiProperty({ example: 'Ficus lyrata', type: String })
-    name!: string;
+    @ApiProperty({ example: 'Photus', type: String })
+    readonly name!: string;
 
-    @Column({ type: 'varchar', nullable: true })
-    @ApiProperty({ example: 'STRAUCH', type: String })
-    art: string | undefined;
+    @Column('varchar')
+    @ApiProperty({ example: 'INDOOR', type: String })
+    readonly art: PflanzeTyp | undefined;
 
-    @Column('decimal', {
-        precision: 8,
-        scale: 2,
-        transformer: new DecimalTransformer(),
-        nullable: true,
-    })
-    @ApiProperty({ example: 29.99, type: Number })
-    preis: Decimal | undefined;
+    @Column('simple-array')
+    schlagwoerter: string[] | null | undefined;
 
-    @Column({ type: 'boolean', default: true })
-    @ApiProperty({ example: true, type: Boolean })
-    lieferbar: boolean | undefined;
-
-    @OneToMany(() => Abbildung, (abbildung) => abbildung.pflanze, {
+    @OneToMany(() => Abbildung, (abbildung) => abbildung.buch, {
         cascade: ['insert', 'remove'],
     })
     readonly abbildungen: Abbildung[] | undefined;
 
-    @OneToOne(() => PflanzeFile, (pflanzeFile) => pflanzeFile.pflanze, {
+    @OneToOne(() => BuchFile, (buchFile) => buchFile.buch, {
         cascade: ['insert', 'remove'],
     })
-    readonly file: PflanzeFile | undefined;
+    readonly file: BuchFile | undefined;
 
     @CreateDateColumn({
         type: dbType === 'sqlite' ? 'datetime' : 'timestamp',
     })
-    erzeugt: Date | undefined;
+    readonly erzeugt: Date | undefined;
 
     @UpdateDateColumn({
         type: dbType === 'sqlite' ? 'datetime' : 'timestamp',
     })
-    aktualisiert: Date | undefined;
-
+    readonly aktualisiert: Date | undefined;
+   
     public toString = (): string =>
         JSON.stringify({
             id: this.id,
             version: this.version,
-            name: this.name,
-            art: this.art,
-            preis: this.preis,
-            lieferbar: this.lieferbar,
+            typ: this.typ,
+            schlagwoerter: this.schlagwoerter,
             erzeugt: this.erzeugt,
             aktualisiert: this.aktualisiert,
         });
