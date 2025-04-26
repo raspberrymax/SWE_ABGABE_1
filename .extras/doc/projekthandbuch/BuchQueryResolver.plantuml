@@ -1,0 +1,80 @@
+' Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
+'
+' This program is free software: you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation, either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+' Preview durch <Alt>d
+
+@startuml Controller-Klasse
+
+interface Promise<T>
+
+package @nestjs/graphql {
+  class "@Resolver" as Resolver
+  hide Resolver circle
+
+  class "@UseInterceptors" as UseInterceptors
+  hide UseInterceptors circle
+
+  class "@Query" as Query
+  hide Query circle
+
+  class "@Args" as Args
+  hide Args circle
+
+  Resolver .left[hidden].> Promise
+}
+
+package pflanze {
+  package entity {
+    class Pflanze <<entity>>
+  }
+
+  package service {
+    class PflanzeReadService << control >>
+  }
+
+  package graphql #DDDDDD {
+    class "type PflanzeDTO = Omit<Pflanze, 'abbildungen' | 'aktualisiert' | 'erzeugt'" as PflanzeDTO
+    hide PflanzeDTO circle
+
+    interface IdInput {
+        id: number
+    }
+
+    class PflanzeQueryResolver << control >> << @Resolver() >> << @UseInterceptors() >> {
+      + @Query() async pflanze(@Args() id: IdInput): Promise<PflanzeDTO>
+      + @Query() async buecher(@Args() titel: string | undefined): Promise<PflanzeDTO[]>
+    }
+
+    PflanzeQueryResolver o-up-> "1" PflanzeReadService : service
+    PflanzeQueryResolver ..> PflanzeDTO
+    PflanzeQueryResolver ..> IdInput
+    PflanzeDTO ..> Pflanze
+    PflanzeQueryResolver ..> Resolver
+
+    PflanzeQueryResolver ..> Promise
+
+    PflanzeDTO .[hidden].> Pflanze
+    Pflanze .[hidden].> Promise
+    PflanzeReadService .[hidden].> Promise
+    Pflanze .[hidden].> Resolver
+    PflanzeReadService .[hidden].> Resolver
+  }
+}
+
+hide empty members
+
+footer (c) Juergen Zimmermann
+
+@enduml

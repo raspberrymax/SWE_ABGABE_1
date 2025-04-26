@@ -1,0 +1,88 @@
+' Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
+'
+' This program is free software: you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation, either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+' Preview durch <Alt>d
+
+@startuml Anwendungskern
+
+interface Promise<T>
+
+package @nestjs/common {
+  class "@Injectable" as Injectable
+  hide Injectable circle
+}
+
+package typeorm {
+  class Repository<T>
+}
+
+package @nestjs/typeorm {
+  class "@InjectRepository" as InjectRepository
+  hide InjectRepository circle
+}
+
+package mail {
+  class MailService
+}
+
+package pflanze {
+  package entity {
+    class Pflanze
+  }
+
+  package service #DDDDDD {
+    class PflanzeInvalid
+    class TitelExists
+    class IsbnExists
+    class VersionInvalid
+    class VersionOutdated
+
+    class PflanzeWriteService << control >> <<@Injectable()>> {
+      + async create(pflanze: Pflanze): Promise<string|PflanzeInvalid|TitelExists|IsbnExists>
+      + async update(id: number, pflanze: Pflanze, version: string): Promise<number|PflanzeInvalid|TitelExists|IsbnExists|VersionInvalid|VersionOutdated>
+      + async delete(id: number): Promise<boolean>
+    }
+
+    PflanzeWriteService o--> "1" PflanzeValidationService: validationService
+    PflanzeWriteService o--> "1" PflanzeReadService: readService
+    PflanzeWriteService o--> "1" Repository: @InjectRepository repo
+    PflanzeWriteService o--> "1" MailService: mailService
+
+    PflanzeWriteService .up.> Injectable
+    PflanzeWriteService .up.> InjectRepository
+
+    PflanzeWriteService .up.> Promise
+    PflanzeWriteService ..> Pflanze
+    PflanzeWriteService .up.> PflanzeInvalid
+    PflanzeWriteService .up.> TitelExists
+    PflanzeWriteService .up.> IsbnExists
+    PflanzeWriteService .up.> VersionInvalid
+    PflanzeWriteService .up.> VersionOutdated
+
+    PflanzeInvalid .up[hidden].> Pflanze
+    Pflanze .up[hidden].> Promise
+    Pflanze .up[hidden].> Injectable
+    Pflanze .up[hidden].> InjectRepository
+    TitelExists .up[hidden].> Pflanze
+    PflanzeValidationService .[hidden].> Repository
+    PflanzeValidationService .[hidden].> MailService
+  }
+}
+
+hide empty members
+
+footer (c) Jürgen Zimmermann
+
+@enduml
