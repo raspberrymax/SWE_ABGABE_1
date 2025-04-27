@@ -24,17 +24,7 @@ import { type PflanzeArt } from '../entity/pflanze.entity.js';
  * Typdefinition für `find` in `pflanze-read.service` und `QueryBuilder.build()`.
  */
 export interface Suchkriterien {
-    readonly isbn?: string;
-    readonly rating?: number | string;
-    readonly art?: PflanzeArt;
-    readonly preis?: number;
-    readonly rabatt?: number;
-    readonly lieferbar?: boolean;
+    readonly name?: string;
+    readonly typ?: PflanzeTyp;
     readonly datum?: string;
-    readonly homepage?: string;
-    readonly javascript?: string;
-    readonly typescript?: string;
-    readonly java?: string;
-    readonly python?: string;
-    readonly titel?: string;
 }

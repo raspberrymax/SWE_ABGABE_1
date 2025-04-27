@@ -24,21 +24,6 @@ import { HttpException, HttpStatus } from '@nestjs/common';
  */
 
 /**
- * Exception-Klasse für eine bereits existierende ISBN-Nummer.
- */
-export class IsbnExistsException extends HttpException {
-    readonly isbn: string;
-
-    constructor(isbn: string) {
-        super(
-            `Die ISBN-Nummer ${isbn} existiert bereits.`,
-            HttpStatus.UNPROCESSABLE_ENTITY,
-        );
-        this.isbn = isbn;
-    }
-}
-
-/**
  * Exception-Klasse für eine ungültige Versionsnummer beim Ändern.
  */
 export class VersionInvalidException extends HttpException {

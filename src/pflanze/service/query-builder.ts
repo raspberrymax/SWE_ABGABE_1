@@ -105,12 +105,6 @@ export class QueryBuilder {
         {
             // NOSONAR
             titel,
-            rating,
-            preis,
-            javascript,
-            typescript,
-            java,
-            python,
             ...restProps
         }: Suchkriterien,
         pageable: Pageable,
@@ -118,12 +112,6 @@ export class QueryBuilder {
         this.#logger.debug(
             'build: titel=%s, rating=%s, preis=%s, javascript=%s, typescript=%s, java=%s, python=%s, restProps=%o, pageable=%o',
             titel,
-            rating,
-            preis,
-            javascript,
-            typescript,
-            java,
-            python,
             restProps,
             pageable,
         );
