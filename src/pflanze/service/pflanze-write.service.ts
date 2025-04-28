@@ -168,10 +168,7 @@ export class PflanzeWriteService {
      */
     async delete(id: number) {
         this.#logger.debug('delete: id=%d', id);
-        const pflanze = await this.#readService.findById({
-            id,
-            mitAbbildungen: true,
-        });
+        await this.#readService.findById({ id });
 
         let deleteResult: DeleteResult | undefined;
         await this.#repo.manager.transaction(async (transactionalMgr) => {

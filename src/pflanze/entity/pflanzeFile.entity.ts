@@ -9,7 +9,7 @@ import { binaryType } from '../../config/db.js';
 import { Pflanze } from './pflanze.entity.js';
 
 @Entity()
-export class BuchFile {
+export class PflanzeFile {
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
@@ -19,9 +19,9 @@ export class BuchFile {
     @Column('varchar')
     mimetype: string | undefined;
 
-    @OneToOne(() => Buch, (buch) => pflanze.file)
-    @JoinColumn({ name: 'buch_id' })
-    buch: Pflanze | undefined;
+    @OneToOne(() => Pflanze, (pflanze) => pflanze.file)
+    @JoinColumn({ name: 'pflanze_id' })
+    pflanze: Pflanze | undefined;
 
     @Column({ type: binaryType })
     data: Uint8Array | undefined;

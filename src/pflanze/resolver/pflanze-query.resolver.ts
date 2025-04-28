@@ -56,7 +56,7 @@ export class PflanzeQueryResolver {
             this.#logger.debug(
                 'findById: pflanze=%s, titel=%o',
                 pflanze.toString(),
-                pflanze.titel,
+                pflanze.name,
             );
         }
         return pflanze;
@@ -84,9 +84,5 @@ export class PflanzeQueryResolver {
                 short,
             );
         }
-        // "Nullish Coalescing" ab ES2020
-        const rabatt = pflanze.rabatt ?? Decimal(0);
-        const shortStr = short === undefined || short ? '%' : 'Prozent';
-        return `${rabatt.toString()} ${shortStr}`;
     }
 }

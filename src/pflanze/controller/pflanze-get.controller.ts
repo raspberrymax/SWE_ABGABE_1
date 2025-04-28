@@ -46,6 +46,15 @@ export class PflanzeQuery implements Suchkriterien {
 
     @ApiProperty({ required: false })
     declare readonly typ?: PflanzeTyp;
+    
+    @ApiProperty({ required: false })
+    declare readonly titel?: string;
+
+    @ApiProperty({ required: false })
+    declare size?: string;
+
+    @ApiProperty({ required: false })
+    declare page?: string;
 }
 
 @Controller(paths.rest)
@@ -106,7 +115,7 @@ export class PflanzeGetController {
 
         // ETags
         const versionDb = pflanze.version;
-        if (version === `"${pflanzeDb}"`) {
+        if (version === `"${pflanze.version}"`) {
             this.#logger.debug('getById: NOT_MODIFIED');
             return res.sendStatus(HttpStatus.NOT_MODIFIED);
         }

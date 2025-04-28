@@ -27,7 +27,6 @@ import { Abbildung } from '../entity/abbildung.entity.js';
 import { Pflanze } from '../entity/pflanze.entity.js';
 import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from './pageable.js';
 import { type Pageable } from './pageable.js';
-import { Titel } from '../entity/titel.entity.js';
 import { type Suchkriterien } from './suchkriterien.js';
 
 /** Typdefinitionen für die Suche mit der Pflanze-ID. */
@@ -47,9 +46,9 @@ export class QueryBuilder {
         .charAt(0)
         .toLowerCase()}${Pflanze.name.slice(1)}`;
 
-    readonly #titelAlias = `${Titel.name
+    readonly #titelAlias = `${Pflanze.name
         .charAt(0)
-        .toLowerCase()}${Titel.name.slice(1)}`;
+        .toLowerCase()}${Pflanze.name.slice(1)}`;
 
     readonly #abbildungAlias = `${Abbildung.name
         .charAt(0)
@@ -104,14 +103,14 @@ export class QueryBuilder {
     build(
         {
             // NOSONAR
-            titel,
+            name,
             ...restProps
         }: Suchkriterien,
         pageable: Pageable,
     ) {
         this.#logger.debug(
             'build: titel=%s, rating=%s, preis=%s, javascript=%s, typescript=%s, java=%s, python=%s, restProps=%o, pageable=%o',
-            titel,
+            name,
             restProps,
             pageable,
         );
@@ -129,79 +128,79 @@ export class QueryBuilder {
         // Titel in der Query: Teilstring des Titels und "case insensitive"
         // CAVEAT: MySQL hat keinen Vergleich mit "case insensitive"
         // type-coverage:ignore-next-line
-        if (titel !== undefined && typeof titel === 'string') {
+        if (name !== undefined && typeof name === 'string') {
             const ilike =
                 typeOrmModuleOptions.type === 'postgres' ? 'ilike' : 'like';
             queryBuilder = queryBuilder.where(
                 `${this.#titelAlias}.titel ${ilike} :titel`,
-                { titel: `%${titel}%` },
+                { titel: `%${name}%` },
             );
             useWhere = false;
         }
 
-        if (rating !== undefined) {
-            const ratingNumber =
-                typeof rating === 'string' ? parseInt(rating) : rating;
-            if (!isNaN(ratingNumber)) {
-                queryBuilder = queryBuilder.where(
-                    `${this.#pflanzeAlias}.rating >= ${ratingNumber}`,
-                );
-                useWhere = false;
-            }
-        }
+        // if (rating !== undefined) {
+        //     const ratingNumber =
+        //         typeof rating === 'string' ? parseInt(rating) : rating;
+        //     if (!isNaN(ratingNumber)) {
+        //         queryBuilder = queryBuilder.where(
+        //             `${this.#pflanzeAlias}.rating >= ${ratingNumber}`,
+        //         );
+        //         useWhere = false;
+        //     }
+        // }
 
-        if (preis !== undefined && typeof preis === 'string') {
-            const preisNumber = Number(preis);
-            queryBuilder = queryBuilder.where(
-                `${this.#pflanzeAlias}.preis <= ${preisNumber}`,
-            );
-            useWhere = false;
-        }
+        // if (preis !== undefined && typeof preis === 'string') {
+        //     const preisNumber = Number(preis);
+        //     queryBuilder = queryBuilder.where(
+        //         `${this.#pflanzeAlias}.preis <= ${preisNumber}`,
+        //     );
+        //     useWhere = false;
+        // }
 
-        if (javascript === 'true') {
-            queryBuilder = useWhere
-                ? queryBuilder.where(
-                      `${this.#pflanzeAlias}.schlagwoerter like '%JAVASCRIPT%'`,
-                  )
-                : queryBuilder.andWhere(
-                      `${this.#pflanzeAlias}.schlagwoerter like '%JAVASCRIPT%'`,
-                  );
-            useWhere = false;
-        }
+        // if (javascript === 'true') {
+        //     queryBuilder = useWhere
+        //         ? queryBuilder.where(
+        //               `${this.#pflanzeAlias}.schlagwoerter like '%JAVASCRIPT%'`,
+        //           )
+        //         : queryBuilder.andWhere(
+        //               `${this.#pflanzeAlias}.schlagwoerter like '%JAVASCRIPT%'`,
+        //           );
+        //     useWhere = false;
+        // }
 
-        if (typescript === 'true') {
-            queryBuilder = useWhere
-                ? queryBuilder.where(
-                      `${this.#pflanzeAlias}.schlagwoerter like '%TYPESCRIPT%'`,
-                  )
-                : queryBuilder.andWhere(
-                      `${this.#pflanzeAlias}.schlagwoerter like '%TYPESCRIPT%'`,
-                  );
-            useWhere = false;
-        }
+        // if (typescript === 'true') {
+        //     queryBuilder = useWhere
+        //         ? queryBuilder.where(
+        //               `${this.#pflanzeAlias}.schlagwoerter like '%TYPESCRIPT%'`,
+        //           )
+        //         : queryBuilder.andWhere(
+        //               `${this.#pflanzeAlias}.schlagwoerter like '%TYPESCRIPT%'`,
+        //           );
+        //     useWhere = false;
+        // }
 
-        // Bei "JAVA" sollen Ergebnisse mit "JAVASCRIPT" _nicht_ angezeigt werden
-        if (java === 'true') {
-            queryBuilder = useWhere
-                ? queryBuilder.where(
-                      `REPLACE(${this.#pflanzeAlias}.schlagwoerter, 'JAVASCRIPT', '') like '%JAVA%'`,
-                  )
-                : queryBuilder.andWhere(
-                      `REPLACE(${this.#pflanzeAlias}.schlagwoerter, 'JAVASCRIPT', '') like '%JAVA%'`,
-                  );
-            useWhere = false;
-        }
+        // // Bei "JAVA" sollen Ergebnisse mit "JAVASCRIPT" _nicht_ angezeigt werden
+        // if (java === 'true') {
+        //     queryBuilder = useWhere
+        //         ? queryBuilder.where(
+        //               `REPLACE(${this.#pflanzeAlias}.schlagwoerter, 'JAVASCRIPT', '') like '%JAVA%'`,
+        //           )
+        //         : queryBuilder.andWhere(
+        //               `REPLACE(${this.#pflanzeAlias}.schlagwoerter, 'JAVASCRIPT', '') like '%JAVA%'`,
+        //           );
+        //     useWhere = false;
+        // }
 
-        if (python === 'true') {
-            queryBuilder = useWhere
-                ? queryBuilder.where(
-                      `${this.#pflanzeAlias}.schlagwoerter like '%PYTHON%'`,
-                  )
-                : queryBuilder.andWhere(
-                      `${this.#pflanzeAlias}.schlagwoerter like '%PYTHON%'`,
-                  );
-            useWhere = false;
-        }
+        // if (python === 'true') {
+        //     queryBuilder = useWhere
+        //         ? queryBuilder.where(
+        //               `${this.#pflanzeAlias}.schlagwoerter like '%PYTHON%'`,
+        //           )
+        //         : queryBuilder.andWhere(
+        //               `${this.#pflanzeAlias}.schlagwoerter like '%PYTHON%'`,
+        //           );
+        //     useWhere = false;
+        // }
 
         // Restliche Properties als Key-Value-Paare: Vergleiche auf Gleichheit
         Object.entries(restProps).forEach(([key, value]) => {

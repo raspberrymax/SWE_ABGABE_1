@@ -6,12 +6,12 @@ import { PflanzeFile } from '../entity/pflanzeFile.entity.js'; // Deine Datei-En
 import { Pflanze } from '../entity/pflanze.entity.js'; // Deine Haupt-Entity
 import { type Pageable } from './pageable.js';
 import { type Slice } from './slice.js';
-import { PflanzeQueryBuilder } from './pflanze-query-builder.js';
-import { type PflanzeSuchkriterien } from './pflanzeSuchkriterien.js';
+import { QueryBuilder } from './query-builder.js';
+import { type Suchkriterien } from './suchkriterien.js';
 
 export type FindByIdParams = {
     readonly id: number;
-    readonly mitDateien?: boolean;
+    readonly mitAbbildungen?: boolean;
 };
 
 @Injectable()
@@ -20,14 +20,14 @@ export class PflanzeReadService {
 
     readonly #pflanzeProps: string[];
 
-    readonly #pflanzeQueryBuilder: PflanzeQueryBuilder;
+    readonly #pflanzeQueryBuilder: QueryBuilder;
 
     readonly #fileRepo: Repository<PflanzeFile>;
 
     readonly #logger = getLogger(PflanzeReadService.name);
 
     constructor(
-        pflanzeQueryBuilder: PflanzeQueryBuilder,
+        pflanzeQueryBuilder: QueryBuilder,
         @InjectRepository(PflanzeFile) fileRepo: Repository<PflanzeFile>,
     ) {
         const dummy = new Pflanze();
@@ -38,12 +38,12 @@ export class PflanzeReadService {
 
     async findById({
         id,
-        mitDateien = false,
+        mitAbbildungen = false,
     }: FindByIdParams): Promise<Readonly<Pflanze>> {
         this.#logger.debug('findById: id=%d', id);
 
         const pflanze = await this.#pflanzeQueryBuilder
-            .buildId({ id, mitDateien })
+            .buildId({ id, mitAbbildungen })
             .getOne();
 
         if (pflanze === null) {
@@ -59,10 +59,10 @@ export class PflanzeReadService {
                 pflanze.toString(),
                 pflanze.name,
             );
-            if (mitDateien) {
+            if (mitAbbildungen) {
                 this.#logger.debug(
                     'findById: dateien=%o',
-                    pflanze.dateien,
+                    pflanze.abbildungen,
                 );
             }
         }
@@ -88,7 +88,7 @@ export class PflanzeReadService {
     }
 
     async find(
-        suchkriterien: PflanzeSuchkriterien | undefined,
+        suchkriterien: Suchkriterien | undefined,
         pageable: Pageable,
     ): Promise<Slice<Pflanze>> {
         this.#logger.debug(
@@ -161,13 +161,13 @@ export class PflanzeReadService {
         return validKeys;
     }
 
-    #checkEnums(suchkriterien: PflanzeSuchkriterien) {
-        const { art } = suchkriterien;
-        this.#logger.debug('#checkEnums: Suchkriterium "art=%s"', art);
+    #checkEnums(suchkriterien: Suchkriterien) {
+        const { typ } = suchkriterien;
+        this.#logger.debug('#checkEnums: Suchkriterium "typ=%s"', typ);
         return (
-            art === undefined ||
-            art === 'INDOOR' ||
-            art === 'OUTDOOR'
+            typ === undefined ||
+            typ === 'INDOOR' ||
+            typ === 'OUTDOOR'
         );
     }
 }

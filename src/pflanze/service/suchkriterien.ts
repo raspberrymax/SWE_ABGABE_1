@@ -18,7 +18,7 @@
  * @packageDocumentation
  */
 
-import { type PflanzeArt } from '../entity/pflanze.entity.js';
+import { type PflanzeTyp } from '../entity/pflanze.entity.js';
 
 /**
  * Typdefinition für `find` in `pflanze-read.service` und `QueryBuilder.build()`.

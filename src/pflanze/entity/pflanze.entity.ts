@@ -19,7 +19,7 @@ import { dbType } from '../../config/db.js';
 import { Abbildung } from './abbildung.entity.js';
 import { PflanzeFile } from './pflanzeFile.entity.js';
 
-export type PflanzeTyp 'INDOOR' | 'OUTDOOR';
+export type PflanzeTyp = 'INDOOR' | 'OUTDOOR';
 
 @Entity()
 export class Pflanze {
@@ -36,20 +36,20 @@ export class Pflanze {
 
     @Column('varchar')
     @ApiProperty({ example: 'INDOOR', type: String })
-    readonly art: PflanzeTyp | undefined;
+    readonly typ: PflanzeTyp | undefined;
 
     @Column('simple-array')
     schlagwoerter: string[] | null | undefined;
 
-    @OneToMany(() => Abbildung, (abbildung) => abbildung.buch, {
+    @OneToMany(() => Abbildung, (abbildung) => abbildung.pflanze, {
         cascade: ['insert', 'remove'],
     })
     readonly abbildungen: Abbildung[] | undefined;
 
-    @OneToOne(() => BuchFile, (buchFile) => buchFile.buch, {
+    @OneToOne(() => PflanzeFile, (pflanzeFile) => pflanzeFile.pflanze, {
         cascade: ['insert', 'remove'],
     })
-    readonly file: BuchFile | undefined;
+    readonly file: PflanzeFile | undefined;
 
     @CreateDateColumn({
         type: dbType === 'sqlite' ? 'datetime' : 'timestamp',

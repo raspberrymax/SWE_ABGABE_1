@@ -18,7 +18,7 @@ export class PflanzeDtoOhneRef {
 
     @IsEnum(['INDOOR', 'OUTDOOR'])
     @ApiProperty({ example: 'INDOOR', type: String })
-    readonly art: PflanzeTyp | undefined;
+    readonly typ: PflanzeTyp | undefined;
 
     @IsOptional()
     @ArrayUnique()
