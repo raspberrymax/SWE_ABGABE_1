@@ -15,7 +15,6 @@
 
 import { UseFilters, UseInterceptors } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import Decimal from 'decimal.js'; // eslint-disable-line @typescript-eslint/naming-convention
 import { Public } from 'nest-keycloak-connect';
 import { getLogger } from '../../logger/logger.js';
 import { ResponseTimeInterceptor } from '../../logger/response-time.interceptor.js';

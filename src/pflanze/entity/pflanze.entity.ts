@@ -4,7 +4,6 @@
  */
 
 import { ApiProperty } from '@nestjs/swagger';
-import Decimal from 'decimal.js'; // eslint-disable-line @typescript-eslint/naming-convention
 import {
     Column,
     CreateDateColumn,
