@@ -46,10 +46,6 @@ export class QueryBuilder {
         .charAt(0)
         .toLowerCase()}${Pflanze.name.slice(1)}`;
 
-    readonly #titelAlias = `${Pflanze.name
-        .charAt(0)
-        .toLowerCase()}${Pflanze.name.slice(1)}`;
-
     readonly #abbildungAlias = `${Abbildung.name
         .charAt(0)
         .toLowerCase()}${Abbildung.name.slice(1)}`;
@@ -70,12 +66,6 @@ export class QueryBuilder {
     buildId({ id, mitAbbildungen = false }: BuildIdParams) {
         // QueryBuilder "pflanze" fuer Repository<Pflanze>
         const queryBuilder = this.#repo.createQueryBuilder(this.#pflanzeAlias);
-
-        // Fetch-Join: aus QueryBuilder "pflanze" die Property "titel" ->  Tabelle "titel"
-        queryBuilder.innerJoinAndSelect(
-            `${this.#pflanzeAlias}.titel`,
-            this.#titelAlias,
-        );
 
         if (mitAbbildungen) {
             // Fetch-Join: aus QueryBuilder "pflanze" die Property "abbildungen" -> Tabelle "abbildung"
@@ -116,12 +106,6 @@ export class QueryBuilder {
         );
 
         let queryBuilder = this.#repo.createQueryBuilder(this.#pflanzeAlias);
-        queryBuilder.innerJoinAndSelect(`${this.#pflanzeAlias}.titel`, 'titel');
-
-        // z.B. { titel: 'a', rating: 5, javascript: true }
-        // "rest properties" fuer anfaengliche WHERE-Klausel: ab ES 2018 https://github.com/tc39/proposal-object-rest-spread
-        // type-coverage:ignore-next-line
-        // const { titel, javascript, typescript, ...otherProps } = suchkriterien;
 
         let useWhere = true;
 
@@ -132,75 +116,11 @@ export class QueryBuilder {
             const ilike =
                 typeOrmModuleOptions.type === 'postgres' ? 'ilike' : 'like';
             queryBuilder = queryBuilder.where(
-                `${this.#titelAlias}.titel ${ilike} :titel`,
-                { titel: `%${name}%` },
+                `${this.#pflanzeAlias}.name ${ilike} :name`,
+                { name: `%${name}%` },
             );
             useWhere = false;
         }
-
-        // if (rating !== undefined) {
-        //     const ratingNumber =
-        //         typeof rating === 'string' ? parseInt(rating) : rating;
-        //     if (!isNaN(ratingNumber)) {
-        //         queryBuilder = queryBuilder.where(
-        //             `${this.#pflanzeAlias}.rating >= ${ratingNumber}`,
-        //         );
-        //         useWhere = false;
-        //     }
-        // }
-
-        // if (preis !== undefined && typeof preis === 'string') {
-        //     const preisNumber = Number(preis);
-        //     queryBuilder = queryBuilder.where(
-        //         `${this.#pflanzeAlias}.preis <= ${preisNumber}`,
-        //     );
-        //     useWhere = false;
-        // }
-
-        // if (javascript === 'true') {
-        //     queryBuilder = useWhere
-        //         ? queryBuilder.where(
-        //               `${this.#pflanzeAlias}.schlagwoerter like '%JAVASCRIPT%'`,
-        //           )
-        //         : queryBuilder.andWhere(
-        //               `${this.#pflanzeAlias}.schlagwoerter like '%JAVASCRIPT%'`,
-        //           );
-        //     useWhere = false;
-        // }
-
-        // if (typescript === 'true') {
-        //     queryBuilder = useWhere
-        //         ? queryBuilder.where(
-        //               `${this.#pflanzeAlias}.schlagwoerter like '%TYPESCRIPT%'`,
-        //           )
-        //         : queryBuilder.andWhere(
-        //               `${this.#pflanzeAlias}.schlagwoerter like '%TYPESCRIPT%'`,
-        //           );
-        //     useWhere = false;
-        // }
-
-        // // Bei "JAVA" sollen Ergebnisse mit "JAVASCRIPT" _nicht_ angezeigt werden
-        // if (java === 'true') {
-        //     queryBuilder = useWhere
-        //         ? queryBuilder.where(
-        //               `REPLACE(${this.#pflanzeAlias}.schlagwoerter, 'JAVASCRIPT', '') like '%JAVA%'`,
-        //           )
-        //         : queryBuilder.andWhere(
-        //               `REPLACE(${this.#pflanzeAlias}.schlagwoerter, 'JAVASCRIPT', '') like '%JAVA%'`,
-        //           );
-        //     useWhere = false;
-        // }
-
-        // if (python === 'true') {
-        //     queryBuilder = useWhere
-        //         ? queryBuilder.where(
-        //               `${this.#pflanzeAlias}.schlagwoerter like '%PYTHON%'`,
-        //           )
-        //         : queryBuilder.andWhere(
-        //               `${this.#pflanzeAlias}.schlagwoerter like '%PYTHON%'`,
-        //           );
-        //     useWhere = false;
-        // }
 
         // Restliche Properties als Key-Value-Paare: Vergleiche auf Gleichheit
         Object.entries(restProps).forEach(([key, value]) => {

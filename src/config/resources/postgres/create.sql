@@ -37,7 +37,7 @@ ALTER ROLE pflanze SET search_path = 'pflanze';
 
 -- https://www.postgresql.org/docs/current/sql-createtype.html
 -- https://www.postgresql.org/docs/current/datatype-enum.html
-CREATE TYPE pflanzetyp AS ENUM ('INDOOR', 'OUTDOOR');
+-- CREATE TYPE pflanzetyp AS ENUM ('INDOOR', 'OUTDOOR');
 
 -- https://www.postgresql.org/docs/current/sql-createtable.html
 -- https://www.postgresql.org/docs/current/datatype.html
