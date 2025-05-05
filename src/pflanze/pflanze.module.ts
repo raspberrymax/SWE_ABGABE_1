@@ -27,8 +27,7 @@ import { PflanzeWriteService } from './service/pflanze-write.service.js';
 import { QueryBuilder } from './service/query-builder.js';
 
 /**
- * Das Modul besteht aus Controller- und Service-Klassen für die Verwaltung von
- * Bücher.
+ * Das Modul für die Pflanzen-Anwendung.
  * @packageDocumentation
  */
 

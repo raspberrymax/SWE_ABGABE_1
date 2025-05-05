@@ -1,0 +1,103 @@
+@startuml Pflanze-Klassendiagramm
+skinparam classAttributeIconSize 0
+
+package entity {
+  class Pflanze {
+    + id: number
+    + version: number
+    + name: string
+    + typ: PflanzeTyp
+    + schlagwoerter: string[]
+    + abbildungen: Abbildung[]
+    + file: PflanzeFile
+    + erzeugt: Date
+    + aktualisiert: Date
+    + toString(): string
+  }
+
+  enum PflanzeTyp {
+    + INDOOR
+    + OUTDOOR
+  }
+
+  class Abbildung {
+    + id: number
+    + beschriftung: string
+    + contentType: string
+    + pflanze: Pflanze
+  }
+
+  class PflanzeFile {
+    + id: number
+    + beschriftung: string
+    + contentType: string
+    + pflanze: Pflanze
+  }
+}
+
+package controller {
+  class PflanzeController {
+    + findById(id: number)
+    + find(query)
+    + create(pflanzeDTO)
+    + update(id: number, pflanzeDTO, version)
+    + delete(id: number)
+  }
+
+  class PflanzeDTO {
+    + name: string
+    + typ: PflanzeTyp
+    + schlagwoerter: string[]
+    + abbildungen: AbbildungDTO[]
+  }
+
+  class AbbildungDTO {
+    + beschriftung: string
+    + contentType: string
+  }
+}
+
+package resolver {
+  class PflanzeQueryResolver {
+    + findById(id: number)
+    + find(suchkriterien)
+  }
+
+  class PflanzeMutationResolver {
+    + create(pflanzeInput)
+    + update(pflanzeUpdateInput)
+    + delete(id: number)
+  }
+}
+
+package service {
+  class PflanzeReadService {
+    + findById(id: number)
+    + find(query)
+  }
+
+  class PflanzeWriteService {
+    + create(pflanze)
+    + update(id: number, pflanze, version)
+    + delete(id: number)
+  }
+}
+
+' Beziehungen
+Pflanze "1" -- "0..*" Abbildung : enthält >
+Pflanze "1" -- "0..1" PflanzeFile : hat >
+
+PflanzeDTO --> PflanzeTyp
+PflanzeDTO "1" -- "0..*" AbbildungDTO : enthält >
+
+PflanzeController --> PflanzeReadService : nutzt >
+PflanzeController --> PflanzeWriteService : nutzt >
+PflanzeController --> PflanzeDTO : verarbeitet >
+
+PflanzeQueryResolver --> PflanzeReadService : nutzt >
+PflanzeMutationResolver --> PflanzeWriteService : nutzt >
+
+PflanzeReadService --> Pflanze : liest >
+PflanzeWriteService --> Pflanze : manipuliert >
+
+@enduml

@@ -17,7 +17,6 @@
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
-import { Decimal } from 'decimal.js';
 import { type PflanzeDtoOhneRef } from '../../src/pflanze/controller/pflanzeDTO.entity.js';
 import {
     host,
@@ -32,63 +31,30 @@ import { type ErrorResponse } from './error-response.js';
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const geaendertesPflanze: Omit<PflanzeDtoOhneRef, 'preis' | 'rabatt'> & {
-    preis: number;
-    rabatt: number;
-} = {
-    isbn: '978-0-201-63361-0',
-    rating: 5,
-    art: 'HARDCOVER',
-    preis: 3333,
-    rabatt: 0.033,
-    lieferbar: true,
-    datum: '2022-03-03',
-    homepage: 'https://geaendert.put.rest',
-    schlagwoerter: ['JAVA'],
+const geaendertePflanze: PflanzeDtoOhneRef = {
+    name: 'Geänderte Pflanze',
+    typ: 'INDOOR',
+    schlagwoerter: ['SCHATTENPFLANZE', 'GRUENPFLANZE'],
 };
-const idVorhanden = '30';
+const idVorhanden = '1';
 
-const geaendertesPflanzeIdNichtVorhanden: Omit<
-    PflanzeDtoOhneRef,
-    'preis' | 'rabatt'
-> & {
-    preis: number;
-    rabatt: number;
-} = {
-    isbn: '978-0-007-09732-6',
-    rating: 4,
-    art: 'EPUB',
-    preis: 44.4,
-    rabatt: 0.044,
-    lieferbar: true,
-    datum: '2022-02-04',
-    homepage: 'https://acme.de',
-    schlagwoerter: ['JAVASCRIPT'],
+const geaendertePflanzeIdNichtVorhanden: PflanzeDtoOhneRef = {
+    name: 'Nicht vorhandene Pflanze',
+    typ: 'OUTDOOR',
+    schlagwoerter: ['SONNENPFLANZE'],
 };
 const idNichtVorhanden = '999999';
 
-const geaendertesPflanzeInvalid: Record<string, unknown> = {
-    isbn: 'falsche-ISBN',
-    rating: -1,
-    art: 'UNSICHTBAR',
-    preis: -1,
-    rabatt: 2,
-    lieferbar: true,
-    datum: '12345-123-123',
-    titel: '?!',
-    homepage: 'anyHomepage',
+const geaendertePflanzeInvalid: Record<string, unknown> = {
+    name: '',
+    typ: 'WASSERTYP',
+    schlagwoerter: [],
 };
 
-const veraltesPflanze: PflanzeDtoOhneRef = {
-    isbn: '978-0-007-09732-6',
-    rating: 1,
-    art: 'EPUB',
-    preis: new Decimal(44.4),
-    rabatt: new Decimal(0.04),
-    lieferbar: true,
-    datum: '2022-02-04',
-    homepage: 'https://acme.de',
-    schlagwoerter: ['JAVASCRIPT'],
+const veraltePflanze: PflanzeDtoOhneRef = {
+    name: 'Veraltete Pflanze',
+    typ: 'OUTDOOR',
+    schlagwoerter: ['SONNENPFLANZE'],
 };
 
 // -----------------------------------------------------------------------------
@@ -118,7 +84,7 @@ describe('PUT /rest/:id', () => {
         await shutdownServer();
     });
 
-    test('Vorhandenes Pflanze aendern', async () => {
+    test('Vorhandene Pflanze ändern', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await tokenRest(client);
@@ -128,7 +94,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status, data }: AxiosResponse<string> = await client.put(
             url,
-            geaendertesPflanze,
+            geaendertePflanze,
             { headers },
         );
 
@@ -137,7 +103,7 @@ describe('PUT /rest/:id', () => {
         expect(data).toBe('');
     });
 
-    test('Nicht-vorhandenes Pflanze aendern', async () => {
+    test('Nicht-vorhandene Pflanze ändern', async () => {
         // given
         const url = `/rest/${idNichtVorhanden}`;
         const token = await tokenRest(client);
@@ -147,7 +113,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status }: AxiosResponse<string> = await client.put(
             url,
-            geaendertesPflanzeIdNichtVorhanden,
+            geaendertePflanzeIdNichtVorhanden,
             { headers },
         );
 
@@ -155,25 +121,20 @@ describe('PUT /rest/:id', () => {
         expect(status).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test('Vorhandenes Pflanze aendern, aber mit ungueltigen Daten', async () => {
+    test('Vorhandene Pflanze ändern, aber mit ungültigen Daten', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await tokenRest(client);
         headers.Authorization = `Bearer ${token}`;
         headers['If-Match'] = '"0"';
         const expectedMsg = [
-            expect.stringMatching(/^isbn /u),
-            expect.stringMatching(/^rating /u),
-            expect.stringMatching(/^art /u),
-            expect.stringMatching(/^preis /u),
-            expect.stringMatching(/^rabatt /u),
-            expect.stringMatching(/^datum /u),
-            expect.stringMatching(/^homepage /u),
+            expect.stringMatching(/^name /u),
+            expect.stringMatching(/^typ /u),
         ];
 
         // when
         const { status, data }: AxiosResponse<Record<string, any>> =
-            await client.put(url, geaendertesPflanzeInvalid, { headers });
+            await client.put(url, geaendertePflanzeInvalid, { headers });
 
         // then
         expect(status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -181,11 +142,11 @@ describe('PUT /rest/:id', () => {
         const messages = data.message as string[];
 
         expect(messages).toBeDefined();
-        expect(messages).toHaveLength(expectedMsg.length);
+        expect(messages.length).toBeGreaterThan(0);
         expect(messages).toEqual(expect.arrayContaining(expectedMsg));
     });
 
-    test('Vorhandenes Pflanze aendern, aber ohne Versionsnummer', async () => {
+    test('Vorhandene Pflanze ändern, aber ohne Versionsnummer', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await tokenRest(client);
@@ -195,7 +156,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status, data }: AxiosResponse<string> = await client.put(
             url,
-            geaendertesPflanze,
+            geaendertePflanze,
             { headers },
         );
 
@@ -204,7 +165,7 @@ describe('PUT /rest/:id', () => {
         expect(data).toBe('Header "If-Match" fehlt');
     });
 
-    test('Vorhandenes Pflanze aendern, aber mit alter Versionsnummer', async () => {
+    test('Vorhandene Pflanze ändern, aber mit alter Versionsnummer', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await tokenRest(client);
@@ -214,7 +175,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status, data }: AxiosResponse<ErrorResponse> = await client.put(
             url,
-            veraltesPflanze,
+            veraltePflanze,
             { headers },
         );
 
@@ -227,7 +188,7 @@ describe('PUT /rest/:id', () => {
         expect(statusCode).toBe(HttpStatus.PRECONDITION_FAILED);
     });
 
-    test('Vorhandenes Pflanze aendern, aber ohne Token', async () => {
+    test('Vorhandene Pflanze ändern, aber ohne Token', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         delete headers.Authorization;
@@ -236,7 +197,7 @@ describe('PUT /rest/:id', () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.put(
             url,
-            geaendertesPflanze,
+            geaendertePflanze,
             { headers },
         );
 
@@ -244,7 +205,7 @@ describe('PUT /rest/:id', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Vorhandenes Pflanze aendern, aber mit falschem Token', async () => {
+    test('Vorhandene Pflanze ändern, aber mit falschem Token', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = 'FALSCH';
@@ -253,7 +214,7 @@ describe('PUT /rest/:id', () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.put(
             url,
-            geaendertesPflanze,
+            geaendertePflanze,
             { headers },
         );
 

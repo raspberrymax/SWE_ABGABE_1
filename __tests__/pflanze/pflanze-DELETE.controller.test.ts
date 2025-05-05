@@ -28,14 +28,14 @@ import { tokenRest } from '../token.js';
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const id = '50';
+const id = '3';
 
 // -----------------------------------------------------------------------------
 // T e s t s
 // -----------------------------------------------------------------------------
 // Test-Suite
 // eslint-disable-next-line max-lines-per-function
-describe('DELETE /rest/buecher', () => {
+describe('DELETE /rest/pflanzen', () => {
     let client: AxiosInstance;
 
     // Testserver starten und dabei mit der DB verbinden
@@ -53,7 +53,7 @@ describe('DELETE /rest/buecher', () => {
         await shutdownServer();
     });
 
-    test('Vorhandenes Pflanze loeschen', async () => {
+    test('Vorhandene Pflanze löschen', async () => {
         // given
         const url = `/rest/${id}`;
         const token = await tokenRest(client);
@@ -72,7 +72,7 @@ describe('DELETE /rest/buecher', () => {
         expect(data).toBeDefined();
     });
 
-    test('Pflanze loeschen, aber ohne Token', async () => {
+    test('Pflanze löschen, aber ohne Token', async () => {
         // given
         const url = `/rest/${id}`;
 
@@ -84,7 +84,7 @@ describe('DELETE /rest/buecher', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Pflanze loeschen, aber mit falschem Token', async () => {
+    test('Pflanze löschen, aber mit falschem Token', async () => {
         // given
         const url = `/rest/${id}`;
         const token = 'FALSCH';
@@ -100,9 +100,9 @@ describe('DELETE /rest/buecher', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Vorhandenes Pflanze als "user" loeschen', async () => {
+    test('Vorhandene Pflanze als "user" löschen', async () => {
         // given
-        const url = `/rest/60`;
+        const url = `/rest/4`;
         const token = await tokenRest(client, 'user', 'p');
         const headers: Record<string, string> = {
             Authorization: `Bearer ${token}`, // eslint-disable-line @typescript-eslint/naming-convention

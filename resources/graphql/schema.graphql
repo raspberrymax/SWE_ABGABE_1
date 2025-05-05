@@ -1,0 +1,146 @@
+# Copyright (C) 2021 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+# siehe app.module.ts und https://www.apollographql.com/docs/apollo-server/schema/schema
+
+# Pflanze Query Definitionen
+"Pflanzendaten für Lesezugriff"
+type Pflanze {
+    "ID einer Pflanze"
+    id: ID!
+    
+    "Versionsnummer für optimistische Synchronisation"
+    version: Int
+    
+    "Name der Pflanze"
+    name: String!
+    
+    "Typ der Pflanze: INDOOR oder OUTDOOR"
+    typ: PflanzeTyp!
+    
+    "Schlagwörter zu einer Pflanze"
+    schlagwoerter: [String]
+    
+    "Abbildungen zu einer Pflanze"
+    abbildungen: [Abbildung]
+    
+    "Dateiinformationen zu einer Pflanze"
+    file: PflanzeFile
+}
+
+"Typ einer Pflanze"
+enum PflanzeTyp {
+    "Eine Indoor-Pflanze"
+    INDOOR
+    
+    "Eine Outdoor-Pflanze"
+    OUTDOOR
+}
+
+"Abbildung zu einer Pflanze"
+type Abbildung {
+    "ID einer Abbildung"
+    id: ID!
+    
+    "Beschriftung einer Abbildung"
+    beschriftung: String!
+    
+    "MIME-Type einer Abbildung"
+    contentType: String!
+}
+
+"Datei zu einer Pflanze"
+type PflanzeFile {
+    "ID einer Datei"
+    id: ID!
+    
+    "Beschriftung einer Datei"
+    beschriftung: String!
+    
+    "MIME-Type einer Datei"
+    contentType: String!
+}
+
+"Suchkriterien für Pflanzen"
+input PflanzeSuchkriterien {
+    "Name einer Pflanze"
+    name: String
+    
+    "Typ einer Pflanze"
+    typ: PflanzeTyp
+}
+
+# Pflanze Mutation Definitionen
+"Eingabedaten für eine neue Pflanze"
+input PflanzeInput {
+    "Name der Pflanze"
+    name: String!
+    
+    "Typ der Pflanze"
+    typ: PflanzeTyp!
+    
+    "Schlagwörter zu einer Pflanze"
+    schlagwoerter: [String!]
+    
+    "Abbildungen zu einer Pflanze"
+    abbildungen: [AbbildungInput!]
+}
+
+"Eingabedaten für die Abbildung"
+input AbbildungInput {
+    "Beschriftung der Abbildung"
+    beschriftung: String!
+    
+    "MIME-Type der Abbildung"
+    contentType: String!
+}
+
+"Eingabedaten für das Aktualisieren einer Pflanze"
+input PflanzeUpdateInput {
+    "ID der Pflanze"
+    id: ID!
+    
+    "Versionsnummer für optimistische Synchronisation"
+    version: Int!
+    
+    "Name der Pflanze"
+    name: String!
+    
+    "Typ der Pflanze"
+    typ: PflanzeTyp!
+    
+    "Schlagwörter zu einer Pflanze"
+    schlagwoerter: [String!]
+}
+
+# Root-Typen
+type Query {
+    "Pflanze mit ID suchen"
+    pflanze(id: ID!): Pflanze
+    
+    "Pflanzen suchen"
+    pflanzen(suchkriterien: PflanzeSuchkriterien): [Pflanze!]!
+}
+
+type Mutation {
+    "Neue Pflanze anlegen"
+    create(input: PflanzeInput!): ID
+    
+    "Pflanze mit ID aktualisieren"
+    update(input: PflanzeUpdateInput!): Int
+    
+    "Pflanze mit ID löschen"
+    delete(id: ID!): Boolean
+}

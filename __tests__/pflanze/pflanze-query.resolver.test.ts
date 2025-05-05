@@ -18,7 +18,7 @@ import { type GraphQLRequest } from '@apollo/server';
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
-import { type Pflanze, type PflanzeArt } from '../../src/pflanze/entity/pflanze.entity.js';
+import { type Pflanze, type PflanzeTyp } from '../../src/pflanze/entity/pflanze.entity.js';
 import { type GraphQLResponseBody } from '../graphql.js';
 import {
     host,
@@ -28,26 +28,20 @@ import {
     startServer,
 } from '../testserver.js';
 
-type PflanzeDTO = Omit<
-    Pflanze,
-    'abbildungen' | 'aktualisiert' | 'erzeugt' | 'rabatt'
-> & {
-    rabatt: string;
-};
+type PflanzeDTO = Omit<Pflanze, 'abbildungen' | 'aktualisiert' | 'erzeugt' | 'file'>;
 
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
 const idVorhanden = '1';
 
-const titelVorhanden = 'Alpha';
-const teilTitelVorhanden = 'a';
-const teilTitelNichtVorhanden = 'abc';
+const nameVorhanden = 'Photus';
+const teilNameVorhanden = 'Ph';
+const teilNameNichtVorhanden = 'xyz';
 
-const isbnVorhanden = '978-3-897-22583-1';
+const typVorhanden = 'INDOOR';
 
-const ratingMin = 3;
-const ratingNichtVorhanden = 99;
+const schlagwortVorhanden = 'SCHATTENPFLANZE';
 
 // -----------------------------------------------------------------------------
 // T e s t s
@@ -82,18 +76,9 @@ describe('GraphQL Queries', () => {
                 {
                     pflanze(id: "${idVorhanden}") {
                         version
-                        isbn
-                        rating
-                        art
-                        preis
-                        lieferbar
-                        datum
-                        homepage
+                        name
+                        typ
                         schlagwoerter
-                        titel {
-                            titel
-                        }
-                        rabatt(short: true)
                     }
                 }
             `,
@@ -111,7 +96,7 @@ describe('GraphQL Queries', () => {
 
         const { pflanze } = data.data! as { pflanze: PflanzeDTO };
 
-        expect(pflanze.titel?.titel).toMatch(/^\w/u);
+        expect(pflanze.name).toMatch(/^\w/u);
         expect(pflanze.version).toBeGreaterThan(-1);
         expect(pflanze.id).toBeUndefined();
     });
@@ -123,9 +108,7 @@ describe('GraphQL Queries', () => {
             query: `
                 {
                     pflanze(id: "${id}") {
-                        titel {
-                            titel
-                        }
+                        name
                     }
                 }
             `,
@@ -147,25 +130,23 @@ describe('GraphQL Queries', () => {
         const [error] = errors!;
         const { message, path, extensions } = error;
 
-        expect(message).toBe(`Es gibt kein Pflanze mit der ID ${id}.`);
+        expect(message).toBe(`Es gibt keine Pflanze mit der ID ${id}.`);
         expect(path).toBeDefined();
         expect(path![0]).toBe('pflanze');
         expect(extensions).toBeDefined();
         expect(extensions!.code).toBe('BAD_USER_INPUT');
     });
 
-    test('Pflanze zu vorhandenem Titel', async () => {
+    test('Pflanze zu vorhandenem Namen', async () => {
         // given
         const body: GraphQLRequest = {
             query: `
                 {
-                    buecher(suchkriterien: {
-                        titel: "${titelVorhanden}"
+                    pflanzen(suchkriterien: {
+                        name: "${nameVorhanden}"
                     }) {
-                        art
-                        titel {
-                            titel
-                        }
+                        typ
+                        name
                     }
                 }
             `,
@@ -181,27 +162,25 @@ describe('GraphQL Queries', () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
 
-        const { buecher } = data.data! as { buecher: PflanzeDTO[] };
+        const { pflanzen } = data.data! as { pflanzen: PflanzeDTO[] };
 
-        expect(buecher).not.toHaveLength(0);
-        expect(buecher).toHaveLength(1);
+        expect(pflanzen).not.toHaveLength(0);
+        expect(pflanzen).toHaveLength(1);
 
-        const [pflanze] = buecher;
+        const [pflanze] = pflanzen;
 
-        expect(pflanze!.titel?.titel).toBe(titelVorhanden);
+        expect(pflanze!.name).toBe(nameVorhanden);
     });
 
-    test('Pflanze zu vorhandenem Teil-Titel', async () => {
+    test('Pflanze zu vorhandenem Teil-Namen', async () => {
         // given
         const body: GraphQLRequest = {
             query: `
                 {
-                    buecher(suchkriterien: {
-                        titel: "${teilTitelVorhanden}"
+                    pflanzen(suchkriterien: {
+                        name: "${teilNameVorhanden}"
                     }) {
-                        titel {
-                            titel
-                        }
+                        name
                     }
                 }
             `,
@@ -217,31 +196,27 @@ describe('GraphQL Queries', () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
 
-        const { buecher } = data.data! as { buecher: PflanzeDTO[] };
+        const { pflanzen } = data.data! as { pflanzen: PflanzeDTO[] };
 
-        expect(buecher).not.toHaveLength(0);
+        expect(pflanzen).not.toHaveLength(0);
 
-        buecher
-            .map((pflanze) => pflanze.titel)
-            .forEach((titel) =>
-                expect(titel?.titel.toLowerCase()).toEqual(
-                    expect.stringContaining(teilTitelVorhanden),
-                ),
+        pflanzen.forEach((pflanze) => {
+            expect(pflanze.name.toLowerCase()).toEqual(
+                expect.stringContaining(teilNameVorhanden.toLowerCase()),
             );
+        });
     });
 
-    test('Pflanze zu nicht vorhandenem Titel', async () => {
+    test('Pflanze zu nicht vorhandenem Namen', async () => {
         // given
         const body: GraphQLRequest = {
             query: `
                 {
-                    buecher(suchkriterien: {
-                        titel: "${teilTitelNichtVorhanden}"
+                    pflanzen(suchkriterien: {
+                        name: "${teilNameNichtVorhanden}"
                     }) {
-                        art
-                        titel {
-                            titel
-                        }
+                        typ
+                        name
                     }
                 }
             `,
@@ -254,7 +229,7 @@ describe('GraphQL Queries', () => {
         // then
         expect(status).toBe(HttpStatus.OK);
         expect(headers['content-type']).toMatch(/json/iu);
-        expect(data.data!.buecher).toBeNull();
+        expect(data.data!.pflanzen).toBeNull();
 
         const { errors } = data;
 
@@ -263,25 +238,24 @@ describe('GraphQL Queries', () => {
         const [error] = errors!;
         const { message, path, extensions } = error;
 
-        expect(message).toMatch(/^Keine Buecher gefunden:/u);
+        expect(message).toMatch(/^Keine Pflanzen gefunden:/u);
         expect(path).toBeDefined();
-        expect(path![0]).toBe('buecher');
+        expect(path![0]).toBe('pflanzen');
         expect(extensions).toBeDefined();
         expect(extensions!.code).toBe('BAD_USER_INPUT');
     });
 
-    test('Pflanze zu vorhandener ISBN-Nummer', async () => {
+    test('Pflanzen zum Typ "INDOOR"', async () => {
         // given
+        const pflanzeTyp: PflanzeTyp = 'INDOOR';
         const body: GraphQLRequest = {
             query: `
                 {
-                    buecher(suchkriterien: {
-                        isbn: "${isbnVorhanden}"
+                    pflanzen(suchkriterien: {
+                        typ: ${pflanzeTyp}
                     }) {
-                        isbn
-                        titel {
-                            titel
-                        }
+                        typ
+                        name
                     }
                 }
             `,
@@ -297,152 +271,28 @@ describe('GraphQL Queries', () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
 
-        const { buecher } = data.data! as { buecher: PflanzeDTO[] };
+        const { pflanzen } = data.data! as { pflanzen: PflanzeDTO[] };
 
-        expect(buecher).not.toHaveLength(0);
-        expect(buecher).toHaveLength(1);
+        expect(pflanzen).not.toHaveLength(0);
 
-        const [pflanze] = buecher;
-        const { isbn, titel } = pflanze!;
+        pflanzen.forEach((pflanze) => {
+            const { typ, name } = pflanze;
 
-        expect(isbn).toBe(isbnVorhanden);
-        expect(titel?.titel).toBeDefined();
-    });
-
-    test('Buecher mit Mindest-"rating"', async () => {
-        // given
-        const body: GraphQLRequest = {
-            query: `
-                {
-                    buecher(suchkriterien: {
-                        rating: ${ratingMin},
-                        titel: "${teilTitelVorhanden}"
-                    }) {
-                        rating
-                        titel {
-                            titel
-                        }
-                    }
-                }
-            `,
-        };
-
-        // when
-        const { status, headers, data }: AxiosResponse<GraphQLResponseBody> =
-            await client.post(graphqlPath, body);
-
-        // then
-        expect(status).toBe(HttpStatus.OK);
-        expect(headers['content-type']).toMatch(/json/iu);
-        expect(data.errors).toBeUndefined();
-
-        expect(data.data).toBeDefined();
-
-        const { buecher } = data.data! as { buecher: PflanzeDTO[] };
-
-        expect(buecher).not.toHaveLength(0);
-
-        buecher.forEach((pflanze) => {
-            const { rating, titel } = pflanze;
-
-            expect(rating).toBeGreaterThanOrEqual(ratingMin);
-            expect(titel?.titel.toLowerCase()).toEqual(
-                expect.stringContaining(teilTitelVorhanden),
-            );
+            expect(typ).toBe(pflanzeTyp);
+            expect(name).toBeDefined();
         });
     });
 
-    test('Kein Pflanze zu nicht-vorhandenem "rating"', async () => {
+    test('Pflanzen zu einem ungültigen Typ', async () => {
         // given
+        const pflanzeTyp = 'UNGUELTIG';
         const body: GraphQLRequest = {
             query: `
                 {
-                    buecher(suchkriterien: {
-                        rating: ${ratingNichtVorhanden}
+                    pflanzen(suchkriterien: {
+                        typ: ${pflanzeTyp}
                     }) {
-                        titel {
-                            titel
-                        }
-                    }
-                }
-            `,
-        };
-
-        // when
-        const { status, headers, data }: AxiosResponse<GraphQLResponseBody> =
-            await client.post(graphqlPath, body);
-
-        // then
-        expect(status).toBe(HttpStatus.OK);
-        expect(headers['content-type']).toMatch(/json/iu);
-        expect(data.data!.buecher).toBeNull();
-
-        const { errors } = data;
-
-        expect(errors).toHaveLength(1);
-
-        const [error] = errors!;
-        const { message, path, extensions } = error;
-
-        expect(message).toMatch(/^Keine Buecher gefunden:/u);
-        expect(path).toBeDefined();
-        expect(path![0]).toBe('buecher');
-        expect(extensions).toBeDefined();
-        expect(extensions!.code).toBe('BAD_USER_INPUT');
-    });
-
-    test('Buecher zur Art "EPUB"', async () => {
-        // given
-        const pflanzeArt: PflanzeArt = 'EPUB';
-        const body: GraphQLRequest = {
-            query: `
-                {
-                    buecher(suchkriterien: {
-                        art: ${pflanzeArt}
-                    }) {
-                        art
-                        titel {
-                            titel
-                        }
-                    }
-                }
-            `,
-        };
-
-        // when
-        const { status, headers, data }: AxiosResponse<GraphQLResponseBody> =
-            await client.post(graphqlPath, body);
-
-        // then
-        expect(status).toBe(HttpStatus.OK);
-        expect(headers['content-type']).toMatch(/json/iu);
-        expect(data.errors).toBeUndefined();
-        expect(data.data).toBeDefined();
-
-        const { buecher } = data.data! as { buecher: PflanzeDTO[] };
-
-        expect(buecher).not.toHaveLength(0);
-
-        buecher.forEach((pflanze) => {
-            const { art, titel } = pflanze;
-
-            expect(art).toBe(pflanzeArt);
-            expect(titel?.titel).toBeDefined();
-        });
-    });
-
-    test('Buecher zur einer ungueltigen Art', async () => {
-        // given
-        const pflanzeArt = 'UNGUELTIG';
-        const body: GraphQLRequest = {
-            query: `
-                {
-                    buecher(suchkriterien: {
-                        art: ${pflanzeArt}
-                    }) {
-                        titel {
-                            titel
-                        }
+                        name
                     }
                 }
             `,
@@ -468,18 +318,16 @@ describe('GraphQL Queries', () => {
         expect(extensions!.code).toBe('GRAPHQL_VALIDATION_FAILED');
     });
 
-    test('Buecher mit lieferbar=true', async () => {
+    test('Pflanzen mit vorhandenem Schlagwort', async () => {
         // given
         const body: GraphQLRequest = {
             query: `
                 {
-                    buecher(suchkriterien: {
-                        lieferbar: true
+                    pflanzen(suchkriterien: {
+                        schlagwoerter: ["${schlagwortVorhanden}"]
                     }) {
-                        lieferbar
-                        titel {
-                            titel
-                        }
+                        schlagwoerter
+                        name
                     }
                 }
             `,
@@ -495,15 +343,15 @@ describe('GraphQL Queries', () => {
         expect(data.errors).toBeUndefined();
         expect(data.data).toBeDefined();
 
-        const { buecher } = data.data! as { buecher: PflanzeDTO[] };
+        const { pflanzen } = data.data! as { pflanzen: PflanzeDTO[] };
 
-        expect(buecher).not.toHaveLength(0);
+        expect(pflanzen).not.toHaveLength(0);
 
-        buecher.forEach((pflanze) => {
-            const { lieferbar, titel } = pflanze;
+        pflanzen.forEach((pflanze) => {
+            const { schlagwoerter, name } = pflanze;
 
-            expect(lieferbar).toBe(true);
-            expect(titel?.titel).toBeDefined();
+            expect(schlagwoerter).toContain(schlagwortVorhanden);
+            expect(name).toBeDefined();
         });
     });
 });

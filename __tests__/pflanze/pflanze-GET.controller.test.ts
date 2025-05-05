@@ -16,7 +16,6 @@
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
-import { Decimal } from 'decimal.js';
 import { type Pflanze } from '../../src/pflanze/entity/pflanze.entity.js';
 import { type Page } from '../../src/pflanze/controller/page.js';
 import {
@@ -31,12 +30,11 @@ import { type ErrorResponse } from './error-response.js';
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const titelVorhanden = 'a';
-const titelNichtVorhanden = 'xx';
-const ratingMin = 3;
-const preisMax = 33.5;
-const schlagwortVorhanden = 'javascript';
-const schlagwortNichtVorhanden = 'csharp';
+const nameVorhanden = 'p';
+const nameNichtVorhanden = 'xx';
+const typVorhanden = 'INDOOR';
+const schlagwortVorhanden = 'schattenpflanze';
+const schlagwortNichtVorhanden = 'wasserpflanze';
 
 // -----------------------------------------------------------------------------
 // T e s t s
@@ -61,7 +59,7 @@ describe('GET /rest', () => {
         await shutdownServer();
     });
 
-    test('Alle Buecher', async () => {
+    test('Alle Pflanzen', async () => {
         // given
 
         // when
@@ -80,9 +78,9 @@ describe('GET /rest', () => {
             });
     });
 
-    test('Buecher mit einem Teil-Titel suchen', async () => {
+    test('Pflanzen mit einem Teil-Namen suchen', async () => {
         // given
-        const params = { titel: titelVorhanden };
+        const params = { name: nameVorhanden };
 
         // when
         const { status, headers, data }: AxiosResponse<Page<Pflanze>> =
@@ -93,19 +91,19 @@ describe('GET /rest', () => {
         expect(headers['content-type']).toMatch(/json/iu);
         expect(data).toBeDefined();
 
-        // Jedes Pflanze hat einen Titel mit dem Teilstring 'a'
+        // Jede Pflanze hat einen Namen mit dem Teilstring 'p'
         data.content
-            .map((pflanze) => pflanze.titel)
-            .forEach((titel) =>
-                expect(titel?.titel.toLowerCase()).toEqual(
-                    expect.stringContaining(titelVorhanden),
+            .map((pflanze) => pflanze.name)
+            .forEach((name) =>
+                expect(name.toLowerCase()).toEqual(
+                    expect.stringContaining(nameVorhanden),
                 ),
             );
     });
 
-    test('Buecher zu einem nicht vorhandenen Teil-Titel suchen', async () => {
+    test('Pflanzen zu einem nicht vorhandenen Teil-Namen suchen', async () => {
         // given
-        const params = { titel: titelNichtVorhanden };
+        const params = { name: nameNichtVorhanden };
 
         // when
         const { status, data }: AxiosResponse<ErrorResponse> = await client.get(
@@ -122,9 +120,9 @@ describe('GET /rest', () => {
         expect(statusCode).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test('Buecher mit Mindest-"rating" suchen', async () => {
+    test('Pflanzen mit Typ suchen', async () => {
         // given
-        const params = { rating: ratingMin };
+        const params = { typ: typVorhanden };
 
         // when
         const { status, headers, data }: AxiosResponse<Page<Pflanze>> =
@@ -135,32 +133,11 @@ describe('GET /rest', () => {
         expect(headers['content-type']).toMatch(/json/iu);
         expect(data).toBeDefined();
 
-        // Jedes Pflanze hat einen Titel mit dem Teilstring 'a'
+        // Jede Pflanze hat den Typ INDOOR
         data.content
-            .map((pflanze) => pflanze.rating)
-            .forEach((rating) =>
-                expect(rating).toBeGreaterThanOrEqual(ratingMin),
-            );
-    });
-
-    test('Buecher mit max. Preis suchen', async () => {
-        // given
-        const params = { preis: preisMax };
-
-        // when
-        const { status, headers, data }: AxiosResponse<Page<Pflanze>> =
-            await client.get('/', { params });
-
-        // then
-        expect(status).toBe(HttpStatus.OK);
-        expect(headers['content-type']).toMatch(/json/iu);
-        expect(data).toBeDefined();
-
-        // Jedes Pflanze hat einen Titel mit dem Teilstring 'a'
-        data.content
-            .map((pflanze) => Decimal(pflanze.preis))
-            .forEach((preis) =>
-                expect(preis.lessThanOrEqualTo(Decimal(preisMax))).toBeTruthy(),
+            .map((pflanze) => pflanze.typ)
+            .forEach((typ) =>
+                expect(typ).toEqual(typVorhanden),
             );
     });
 
@@ -178,7 +155,7 @@ describe('GET /rest', () => {
         // JSON-Array mit mind. 1 JSON-Objekt
         expect(data).toBeDefined();
 
-        // Jedes Pflanze hat im Array der Schlagwoerter z.B. "javascript"
+        // Jede Pflanze hat im Array der Schlagwoerter z.B. "schattenpflanze"
         data.content
             .map((pflanze) => pflanze.schlagwoerter)
             .forEach((schlagwoerter) =>
@@ -188,7 +165,7 @@ describe('GET /rest', () => {
             );
     });
 
-    test('Keine Buecher zu einem nicht vorhandenen Schlagwort', async () => {
+    test('Keine Pflanzen zu einem nicht vorhandenen Schlagwort', async () => {
         // given
         const params = { [schlagwortNichtVorhanden]: 'true' };
 
@@ -207,7 +184,7 @@ describe('GET /rest', () => {
         expect(statusCode).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test('Keine Buecher zu einer nicht-vorhandenen Property', async () => {
+    test('Keine Pflanzen zu einer nicht-vorhandenen Property', async () => {
         // given
         const params = { foo: 'bar' };
 

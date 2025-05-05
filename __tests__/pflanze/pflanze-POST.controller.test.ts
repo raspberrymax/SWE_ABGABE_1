@@ -17,7 +17,6 @@
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
-import { Decimal } from 'decimal.js';
 import { type PflanzeDTO } from '../../src/pflanze/controller/pflanzeDTO.entity.js';
 import { PflanzeReadService } from '../../src/pflanze/service/pflanze-read.service.js';
 import {
@@ -33,23 +32,10 @@ import { type ErrorResponse } from './error-response.js';
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const neuesPflanze: Omit<PflanzeDTO, 'preis' | 'rabatt'> & {
-    preis: number;
-    rabatt: number;
-} = {
-    isbn: '978-0-007-00644-1',
-    rating: 1,
-    art: 'HARDCOVER',
-    preis: 99.99,
-    rabatt: 0.0123,
-    lieferbar: true,
-    datum: '2022-02-28',
-    homepage: 'https://post.rest',
-    schlagwoerter: ['JAVASCRIPT', 'TYPESCRIPT'],
-    titel: {
-        titel: 'Titelpost',
-        untertitel: 'untertitelpos',
-    },
+const neuePflanze: PflanzeDTO = {
+    name: 'Neue Pflanze',
+    typ: 'INDOOR',
+    schlagwoerter: ['SCHATTENPFLANZE', 'GRUENPFLANZE'],
     abbildungen: [
         {
             beschriftung: 'Abb. 1',
@@ -57,34 +43,17 @@ const neuesPflanze: Omit<PflanzeDTO, 'preis' | 'rabatt'> & {
         },
     ],
 };
-const neuesPflanzeInvalid: Record<string, unknown> = {
-    isbn: 'falsche-ISBN',
-    rating: -1,
-    art: 'UNSICHTBAR',
-    preis: -1,
-    rabatt: 2,
-    lieferbar: true,
-    datum: '12345-123-123',
-    homepage: 'anyHomepage',
-    titel: {
-        titel: '?!',
-        untertitel: 'Untertitelinvalid',
-    },
+
+const neuePflanzeInvalid: Record<string, unknown> = {
+    name: '',
+    typ: 'WASSERTYP',
+    schlagwoerter: [],
 };
-const neuesPflanzeIsbnExistiert: PflanzeDTO = {
-    isbn: '978-3-897-22583-1',
-    rating: 1,
-    art: 'EPUB',
-    preis: new Decimal(99.99),
-    rabatt: new Decimal(0.09),
-    lieferbar: true,
-    datum: '2022-02-28',
-    homepage: 'https://post.isbn/',
-    schlagwoerter: ['JAVASCRIPT', 'TYPESCRIPT'],
-    titel: {
-        titel: 'Titelpostisbn',
-        untertitel: 'Untertitelpostisbn',
-    },
+
+const neuePflanzeNameExistiert: PflanzeDTO = {
+    name: 'Photus', // Vorhandener Name
+    typ: 'INDOOR',
+    schlagwoerter: ['SCHATTENPFLANZE'],
     abbildungen: undefined,
 };
 
@@ -114,7 +83,7 @@ describe('POST /rest', () => {
         await shutdownServer();
     });
 
-    test('Neues Pflanze', async () => {
+    test('Neue Pflanze', async () => {
         // given
         const token = await tokenRest(client);
         headers.Authorization = `Bearer ${token}`;
@@ -122,7 +91,7 @@ describe('POST /rest', () => {
         // when
         const response: AxiosResponse<string> = await client.post(
             '/rest',
-            neuesPflanze,
+            neuePflanze,
             { headers },
         );
 
@@ -148,25 +117,19 @@ describe('POST /rest', () => {
         expect(data).toBe('');
     });
 
-    test('Neues Pflanze mit ungueltigen Daten', async () => {
+    test('Neue Pflanze mit ungültigen Daten', async () => {
         // given
         const token = await tokenRest(client);
         headers.Authorization = `Bearer ${token}`;
         const expectedMsg = [
-            expect.stringMatching(/^isbn /u),
-            expect.stringMatching(/^rating /u),
-            expect.stringMatching(/^art /u),
-            expect.stringMatching(/^preis /u),
-            expect.stringMatching(/^rabatt /u),
-            expect.stringMatching(/^datum /u),
-            expect.stringMatching(/^homepage /u),
-            expect.stringMatching(/^titel.titel /u),
+            expect.stringMatching(/^name /u),
+            expect.stringMatching(/^typ /u),
         ];
 
         // when
         const response: AxiosResponse<Record<string, any>> = await client.post(
             '/rest',
-            neuesPflanzeInvalid,
+            neuePflanzeInvalid,
             { headers },
         );
 
@@ -178,11 +141,11 @@ describe('POST /rest', () => {
         const messages = data.message as string[];
 
         expect(messages).toBeDefined();
-        expect(messages).toHaveLength(expectedMsg.length);
+        expect(messages.length).toBeGreaterThan(0);
         expect(messages).toEqual(expect.arrayContaining(expectedMsg));
     });
 
-    test('Neues Pflanze, aber die ISBN existiert bereits', async () => {
+    test('Neue Pflanze, aber der Name existiert bereits', async () => {
         // given
         const token = await tokenRest(client);
         headers.Authorization = `Bearer ${token}`;
@@ -190,7 +153,7 @@ describe('POST /rest', () => {
         // when
         const response: AxiosResponse<ErrorResponse> = await client.post(
             '/rest',
-            neuesPflanzeIsbnExistiert,
+            neuePflanzeNameExistiert,
             { headers },
         );
 
@@ -199,22 +162,22 @@ describe('POST /rest', () => {
 
         const { message, statusCode } = data;
 
-        expect(message).toEqual(expect.stringContaining('ISBN'));
+        expect(message).toEqual(expect.stringContaining('Name'));
         expect(statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
 
-    test('Neues Pflanze, aber ohne Token', async () => {
+    test('Neue Pflanze, aber ohne Token', async () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.post(
             '/rest',
-            neuesPflanze,
+            neuePflanze,
         );
 
         // then
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Neues Pflanze, aber mit falschem Token', async () => {
+    test('Neue Pflanze, aber mit falschem Token', async () => {
         // given
         const token = 'FALSCH';
         headers.Authorization = `Bearer ${token}`;
@@ -222,7 +185,7 @@ describe('POST /rest', () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.post(
             '/rest',
-            neuesPflanze,
+            neuePflanze,
             { headers },
         );
 

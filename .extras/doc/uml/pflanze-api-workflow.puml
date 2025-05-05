@@ -1,0 +1,107 @@
+@startuml Pflanze-API-Workflow
+!pragma useVerticalIf on
+
+actor Client as client
+participant "REST-API" as api
+participant "Service" as service
+database "Datenbank" as db
+
+' GET alle Pflanzen
+client -> api : GET /rest
+activate api
+    api -> service : find(query)
+    activate service
+        service -> db : SELECT * FROM pflanze WHERE ...
+        db --> service : Pflanzen-Liste
+    service --> api : Pflanzen-Liste
+    deactivate service
+api --> client : 200 OK + Pflanzen-Liste
+deactivate api
+
+' GET eine Pflanze
+client -> api : GET /rest/{id}
+activate api
+    api -> service : findById(id)
+    activate service
+        service -> db : SELECT * FROM pflanze WHERE id = ?
+        db --> service : Pflanze oder null
+        alt Pflanze gefunden
+            service --> api : Pflanze
+            api --> client : 200 OK + Pflanze
+        else Pflanze nicht gefunden
+            service --> api : null
+            api --> client : 404 Not Found
+        end
+    deactivate service
+deactivate api
+
+' POST neue Pflanze
+client -> api : POST /rest + PflanzeDTO
+activate api
+    api -> service : create(pflanzeDTO)
+    activate service
+        service -> db : INSERT INTO pflanze ...
+        db --> service : Neue ID
+    service --> api : ID
+    deactivate service
+api --> client : 201 Created
+deactivate api
+
+' PUT Pflanze aktualisieren
+client -> api : PUT /rest/{id} + PflanzeDTO + If-Match
+activate api
+    api -> service : update(id, pflanzeDTO, version)
+    activate service
+        alt Version korrekt
+            service -> db : UPDATE pflanze SET ... WHERE id = ?
+            db --> service : OK
+            service --> api : OK
+            api --> client : 204 No Content
+        else Falsche Version
+            service --> api : Fehler
+            api --> client : 412 Precondition Failed
+        end
+    deactivate service
+deactivate api
+
+' DELETE Pflanze
+client -> api : DELETE /rest/{id}
+activate api
+    api -> service : delete(id)
+    activate service
+        service -> db : DELETE FROM pflanze WHERE id = ?
+        db --> service : OK
+    service --> api : OK
+    deactivate service
+api --> client : 204 No Content
+deactivate api
+
+' GraphQL-Workflow
+client -> api : POST /graphql (pflanze-Query)
+activate api
+    api -> service : findById(id)
+    service -> db : SELECT * FROM pflanze WHERE id = ?
+    db --> service : Pflanze
+    service --> api : Pflanze
+api --> client : 200 OK + Pflanze-Daten
+deactivate api
+
+client -> api : POST /graphql (pflanzen-Query)
+activate api
+    api -> service : find(suchkriterien)
+    service -> db : SELECT * FROM pflanze WHERE ...
+    db --> service : Pflanzen-Liste
+    service --> api : Pflanzen-Liste
+api --> client : 200 OK + Pflanzen-Liste
+deactivate api
+
+client -> api : POST /graphql (create-Mutation)
+activate api
+    api -> service : create(pflanzeInput)
+    service -> db : INSERT INTO pflanze ...
+    db --> service : Neue ID
+    service --> api : ID
+api --> client : 200 OK + ID
+deactivate api
+
+@enduml

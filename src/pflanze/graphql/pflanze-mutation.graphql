@@ -1,0 +1,55 @@
+# Typdefinitionen für Mutations
+
+"Eingabedaten für eine neue Pflanze"
+input PflanzeInput {
+    "Name der Pflanze"
+    name: String!
+    
+    "Typ der Pflanze"
+    typ: PflanzeTyp!
+    
+    "Schlagwörter zu einer Pflanze"
+    schlagwoerter: [String!]
+    
+    "Abbildungen zu einer Pflanze"
+    abbildungen: [AbbildungInput!]
+}
+
+"Eingabedaten für die Abbildung"
+input AbbildungInput {
+    "Beschriftung der Abbildung"
+    beschriftung: String!
+    
+    "MIME-Type der Abbildung"
+    contentType: String!
+}
+
+"Neues Pflanze anlegen oder vorhandenes Pflanze aktualisieren"
+type Mutation {
+    "Neue Pflanze anlegen"
+    create(input: PflanzeInput!): ID
+    
+    "Pflanze mit ID aktualisieren"
+    update(input: PflanzeUpdateInput!): Int
+    
+    "Pflanze mit ID löschen"
+    delete(id: ID!): Boolean
+}
+
+"Eingabedaten für das Aktualisieren einer Pflanze"
+input PflanzeUpdateInput {
+    "ID der Pflanze"
+    id: ID!
+    
+    "Versionsnummer für optimistische Synchronisation"
+    version: Int!
+    
+    "Name der Pflanze"
+    name: String!
+    
+    "Typ der Pflanze"
+    typ: PflanzeTyp!
+    
+    "Schlagwörter zu einer Pflanze"
+    schlagwoerter: [String!]
+}

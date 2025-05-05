@@ -1,0 +1,76 @@
+# Typdefinitionen für Queries
+
+"Pflanzendaten für Lesezugriff"
+type Pflanze {
+    "ID einer Pflanze"
+    id: ID!
+    
+    "Versionsnummer für optimistische Synchronisation"
+    version: Int
+    
+    "Name der Pflanze"
+    name: String!
+    
+    "Typ der Pflanze: INDOOR oder OUTDOOR"
+    typ: PflanzeTyp!
+    
+    "Schlagwörter zu einer Pflanze"
+    schlagwoerter: [String]
+    
+    "Abbildungen zu einer Pflanze"
+    abbildungen: [Abbildung]
+    
+    "Dateiinformationen zu einer Pflanze"
+    file: PflanzeFile
+}
+
+"Typ einer Pflanze"
+enum PflanzeTyp {
+    "Eine Indoor-Pflanze"
+    INDOOR
+    
+    "Eine Outdoor-Pflanze"
+    OUTDOOR
+}
+
+"Abbildung zu einer Pflanze"
+type Abbildung {
+    "ID einer Abbildung"
+    id: ID!
+    
+    "Beschriftung einer Abbildung"
+    beschriftung: String!
+    
+    "MIME-Type einer Abbildung"
+    contentType: String!
+}
+
+"Datei zu einer Pflanze"
+type PflanzeFile {
+    "ID einer Datei"
+    id: ID!
+    
+    "Beschriftung einer Datei"
+    beschriftung: String!
+    
+    "MIME-Type einer Datei"
+    contentType: String!
+}
+
+"Suchkriterien für Pflanzen"
+input PflanzeSuchkriterien {
+    "Name einer Pflanze"
+    name: String
+    
+    "Typ einer Pflanze"
+    typ: PflanzeTyp
+}
+
+"Pflanzen"
+type Query {
+    "Pflanze mit ID suchen"
+    pflanze(id: ID!): Pflanze
+    
+    "Pflanzen suchen"
+    pflanzen(suchkriterien: PflanzeSuchkriterien): [Pflanze!]!
+}

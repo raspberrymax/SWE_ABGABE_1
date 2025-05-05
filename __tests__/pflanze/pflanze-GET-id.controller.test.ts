@@ -92,7 +92,7 @@ describe('GET /rest/:id', () => {
         expect(id?.toString()).toBe(idVorhanden);
     });
 
-    test('Kein Pflanze zu nicht-vorhandener ID', async () => {
+    test('Keine Pflanze zu nicht-vorhandener ID', async () => {
         // given
         const url = `/${idNichtVorhanden}`;
 
@@ -110,7 +110,7 @@ describe('GET /rest/:id', () => {
         expect(statusCode).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test('Kein Pflanze zu falscher ID', async () => {
+    test('Keine Pflanze zu falscher ID', async () => {
         // given
         const url = `/${idFalsch}`;
 

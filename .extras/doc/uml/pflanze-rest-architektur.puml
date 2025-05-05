@@ -1,0 +1,47 @@
+@startuml Pflanze-REST-Architektur
+skinparam componentStyle rectangle
+
+!define ICONURL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.4.0
+!includeurl ICONURL/common.puml
+!includeurl ICONURL/devicons/nestjs.puml
+!includeurl ICONURL/devicons/postgresql.puml
+!includeurl ICONURL/font-awesome-5/database.puml
+
+skinparam componentStyle rectangle
+
+cloud "Client" as client {
+  [Browser] as browser
+  [REST Client] as restClient
+  [GraphQL Client] as gqlClient
+}
+
+node "NestJS" <<$nestjs>> {
+  [REST Controller] as restController
+  [GraphQL Resolver] as graphqlResolver
+  [Service] as service
+  [Repository] as repository
+}
+
+database "PostgreSQL" <<$postgresql>> {
+  [Pflanze-Tabelle] as pflanzeTable
+  [Abbildung-Tabelle] as abbildungTable
+  [PflanzeFile-Tabelle] as pflanzeFileTable
+}
+
+' REST-Beziehungen
+restClient --> restController : HTTP-Requests
+restController --> service : DTO <-> Entity
+service --> repository : Entity
+repository --> pflanzeTable : TypeORM
+repository --> abbildungTable : TypeORM
+repository --> pflanzeFileTable : TypeORM
+
+' GraphQL-Beziehungen
+gqlClient --> graphqlResolver : GraphQL-Requests
+graphqlResolver --> service : Input <-> Entity
+
+' Browser nutzt beide Clients
+browser --> restClient : JavaScript
+browser --> gqlClient : JavaScript
+
+@enduml
