@@ -86,6 +86,6 @@ GraphQLClient ~~> [RequestLoggerMiddleware]
 
 [MailService] ~[hidden]~> [nest-keycloak-connect]
 
-footer (c) Jürgen Zimmermann
+footer (c) Max Jagiella
 
 @enduml

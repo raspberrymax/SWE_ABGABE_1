@@ -129,7 +129,7 @@ LABEL org.opencontainers.image.title="pflanze" \
   org.opencontainers.image.description="Appserver pflanze mit Basis-Image Debian Bookworm" \
   org.opencontainers.image.version="2025.4.1-bookworm" \
   org.opencontainers.image.licenses="GPL-3.0-or-later" \
-  org.opencontainers.image.authors="Juergen.Zimmermann@h-ka.de"
+  org.opencontainers.image.authors="MaxJagiella@gmail.com"
 
 RUN <<EOF
 set -eux

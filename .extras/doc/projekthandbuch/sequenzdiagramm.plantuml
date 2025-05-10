@@ -27,6 +27,6 @@ Gast -> PflanzeGetController : GET / getById()
 PflanzeGetController -> PflanzeReadService: findById()
 PflanzeReadService -> pflanze: [TypeORM]
 
-footer (c) Jürgen Zimmermann
+footer (c) Max Jagiella
 
 @enduml

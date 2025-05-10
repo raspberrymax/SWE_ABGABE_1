@@ -59,6 +59,6 @@ entity "Abbildung" {
 Pflanze ||..|| Titel
 Pflanze ||..o{ Abbildung
 
-footer (c) Jürgen Zimmermann
+footer (c) Max Jagiella
 
 @enduml

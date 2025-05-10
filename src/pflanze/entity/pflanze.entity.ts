@@ -22,7 +22,6 @@ export type PflanzeTyp = 'INDOOR' | 'OUTDOOR';
 
 @Entity()
 export class Pflanze {
-    
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
@@ -59,7 +58,7 @@ export class Pflanze {
         type: dbType === 'sqlite' ? 'datetime' : 'timestamp',
     })
     readonly aktualisiert: Date | undefined;
-   
+
     public toString = (): string =>
         JSON.stringify({
             id: this.id,

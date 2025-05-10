@@ -8,7 +8,7 @@ node_modules
 
 # Generierte Dateien
 build
-.extras/doc/projekthandpflanze/html/*
+.extras/doc/projekthandbuch/html/*
 .extras/doc/folien/*.html
 .extras/doc/api/*
 .extras/doc/ReadMe.html

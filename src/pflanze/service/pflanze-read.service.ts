@@ -47,7 +47,9 @@ export class PflanzeReadService {
             .getOne();
 
         if (pflanze === null) {
-            throw new NotFoundException(`Es gibt keine Pflanze mit der ID ${id}.`);
+            throw new NotFoundException(
+                `Es gibt keine Pflanze mit der ID ${id}.`,
+            );
         }
         if (pflanze.schlagwoerter === null) {
             pflanze.schlagwoerter = [];
@@ -60,10 +62,7 @@ export class PflanzeReadService {
                 pflanze.name,
             );
             if (mitAbbildungen) {
-                this.#logger.debug(
-                    'findById: dateien=%o',
-                    pflanze.abbildungen,
-                );
+                this.#logger.debug('findById: dateien=%o', pflanze.abbildungen);
             }
         }
         return pflanze;
@@ -83,7 +82,10 @@ export class PflanzeReadService {
             return;
         }
 
-        this.#logger.debug('findFileByPflanzeId: filename=%s', pflanzeFile.filename);
+        this.#logger.debug(
+            'findFileByPflanzeId: filename=%s',
+            pflanzeFile.filename,
+        );
         return pflanzeFile;
     }
 
@@ -97,15 +99,24 @@ export class PflanzeReadService {
             pageable,
         );
 
-        if (suchkriterien === undefined || Object.keys(suchkriterien).length === 0) {
+        if (
+            suchkriterien === undefined ||
+            Object.keys(suchkriterien).length === 0
+        ) {
             return await this.#findAll(pageable);
         }
 
-        if (!this.#checkKeys(Object.keys(suchkriterien)) || !this.#checkEnums(suchkriterien)) {
+        if (
+            !this.#checkKeys(Object.keys(suchkriterien)) ||
+            !this.#checkEnums(suchkriterien)
+        ) {
             throw new NotFoundException('Ungueltige Suchkriterien');
         }
 
-        const queryBuilder = this.#pflanzeQueryBuilder.build(suchkriterien, pageable);
+        const queryBuilder = this.#pflanzeQueryBuilder.build(
+            suchkriterien,
+            pageable,
+        );
         const pflanzen = await queryBuilder.getMany();
         if (pflanzen.length === 0) {
             this.#logger.debug('find: Keine Pflanzen gefunden');
@@ -121,7 +132,9 @@ export class PflanzeReadService {
         const queryBuilder = this.#pflanzeQueryBuilder.build({}, pageable);
         const pflanzen = await queryBuilder.getMany();
         if (pflanzen.length === 0) {
-            throw new NotFoundException(`Ungueltige Seite "${pageable.number}"`);
+            throw new NotFoundException(
+                `Ungueltige Seite "${pageable.number}"`,
+            );
         }
         const totalElements = await queryBuilder.getCount();
         return this.#createSlice(pflanzen, totalElements);
@@ -164,10 +177,6 @@ export class PflanzeReadService {
     #checkEnums(suchkriterien: Suchkriterien) {
         const { typ } = suchkriterien;
         this.#logger.debug('#checkEnums: Suchkriterium "typ=%s"', typ);
-        return (
-            typ === undefined ||
-            typ === 'INDOOR' ||
-            typ === 'OUTDOOR'
-        );
+        return typ === undefined || typ === 'INDOOR' || typ === 'OUTDOOR';
     }
 }

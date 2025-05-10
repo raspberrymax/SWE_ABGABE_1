@@ -18,7 +18,10 @@ import { type GraphQLRequest } from '@apollo/server';
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
-import { type Pflanze, type PflanzeTyp } from '../../src/pflanze/entity/pflanze.entity.js';
+import {
+    type Pflanze,
+    type PflanzeTyp,
+} from '../../src/pflanze/entity/pflanze.entity.js';
 import { type GraphQLResponseBody } from '../graphql.js';
 import {
     host,
@@ -28,7 +31,10 @@ import {
     startServer,
 } from '../testserver.js';
 
-type PflanzeDTO = Omit<Pflanze, 'abbildungen' | 'aktualisiert' | 'erzeugt' | 'file'>;
+type PflanzeDTO = Omit<
+    Pflanze,
+    'abbildungen' | 'aktualisiert' | 'erzeugt' | 'file'
+>;
 
 // -----------------------------------------------------------------------------
 // T e s t d a t e n

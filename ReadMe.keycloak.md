@@ -17,7 +17,7 @@
   along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
-[Juergen Zimmermann](mailto:Juergen.Zimmermann@h-ka.de)
+[Juergen Zimmermann](mailto:MaxJagiella@gmail.com)
 
 > Diese Datei ist in Markdown geschrieben und kann mit `<Strg><Shift>v` in
 > VS Code leicht gelesen werden.

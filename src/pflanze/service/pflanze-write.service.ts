@@ -142,7 +142,9 @@ export class PflanzeWriteService {
         );
         if (id === undefined) {
             this.#logger.debug('update: Keine gültige ID');
-            throw new NotFoundException(`Es gibt keine Pflanze mit der ID ${id}.`);
+            throw new NotFoundException(
+                `Es gibt keine Pflanze mit der ID ${id}.`,
+            );
         }
 
         const validateResult = await this.#validateUpdate(pflanze, id, version);

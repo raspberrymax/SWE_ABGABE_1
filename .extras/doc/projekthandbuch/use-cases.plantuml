@@ -32,6 +32,6 @@ rectangle pflanze {
     Kunde --> (Pflanze ändern)
 }
 
-footer (c) Jürgen Zimmermann
+footer (c) Max Jagiella
 
 @enduml

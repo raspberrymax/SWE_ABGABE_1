@@ -15,8 +15,8 @@
 
 // Preview durch <Strg><Shift>v
 
-= Projekthandpflanze
-Jürgen Zimmermann <Juergen.Zimmermann@h-ka.de>
+= Projekthandbuch
+Max Jagiella <MaxJagiella@gmail.com>
 :doctype: book
 :toc: left
 :sectanchors:
@@ -32,7 +32,7 @@ Jürgen Zimmermann <Juergen.Zimmermann@h-ka.de>
 // http://de.plantuml.com/component.html
 // https://github.com/odrotbohm/asciidoctor-plantuml
 
-IMPORTANT: Copyright (C) 2020 - present Jürgen Zimmermann, Hochschule Karlsruhe. +
+IMPORTANT: Copyright (C) 2020 - present Max Jagiella, Hochschule Karlsruhe. +
            Free use of this software is granted under the terms of the
            GNU General Public License (GPL) v3. +
            For the full text of the license, see the http://www.gnu.org/licenses/gpl-3.0.html[license] file.
@@ -85,7 +85,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
 tempor invidunt ut.
 
 ."PflanzeWriteController" für Schreibzugriffe an der REST-Schnittstelle
-[plantuml,PflanzeGetController,svg]
+[plantuml,PflanzeWriteController,svg]
 ----
 include::PflanzeWriteController.plantuml[]
 ----

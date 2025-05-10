@@ -77,7 +77,10 @@ export class PflanzeMutationResolver {
         const idStr = id.id;
         this.#logger.debug('delete: id=%s', idStr);
         const deletePerformed = await this.#service.delete(idStr);
-        this.#logger.debug('deletePflanze: deletePerformed=%s', deletePerformed);
+        this.#logger.debug(
+            'deletePflanze: deletePerformed=%s',
+            deletePerformed,
+        );
         return deletePerformed;
     }
 

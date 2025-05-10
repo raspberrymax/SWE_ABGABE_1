@@ -91,22 +91,37 @@ export class PflanzeWriteController {
     @ApiForbiddenResponse({ description: MSG_FORBIDDEN })
     @UseInterceptors(FileInterceptor('file'))
     async addFile(
-        @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND })) id: number,
+        @Param(
+            'id',
+            new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_FOUND }),
+        )
+        id: number,
         @UploadedFile() file: Express.Multer.File,
         @Req() req: Request,
         @Res() res: Response,
     ): Promise<Response> {
-        this.#logger.debug('addFile: id=%d, originalname=%s', id, file.originalname);
+        this.#logger.debug(
+            'addFile: id=%d, originalname=%s',
+            id,
+            file.originalname,
+        );
 
         try {
-            await this.#service.addFile(id, file.buffer, file.originalname, file.mimetype);
+            await this.#service.addFile(
+                id,
+                file.buffer,
+                file.originalname,
+                file.mimetype,
+            );
 
             const location = `${createBaseUri(req)}/file/${id}`;
             this.#logger.debug('addFile: location=%s', location);
             return res.location(location).send();
         } catch (error) {
             this.#logger.error('addFile: error=%o', error);
-            return res.status(HttpStatus.BAD_REQUEST).send('Fehler beim Hochladen der Datei');
+            return res
+                .status(HttpStatus.BAD_REQUEST)
+                .send('Fehler beim Hochladen der Datei');
         }
     }
 
@@ -156,7 +171,11 @@ export class PflanzeWriteController {
         }
 
         const pflanze = this.#pflanzeDtoOhneRefToPflanze(pflanzeDTO);
-        const neueVersion = await this.#service.update({ id, pflanze, version });
+        const neueVersion = await this.#service.update({
+            id,
+            pflanze,
+            version,
+        });
         this.#logger.debug('put: version=%d', neueVersion);
         return res.header('ETag', `"${neueVersion}"`).send();
     }

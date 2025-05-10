@@ -33,10 +33,10 @@ license = "GPLv3"
 license-files = ["LICENSE"]
 keywords = ["Lasttest", "Python"]
 authors = [
-  { name = "Juergen Zimmermann", email = "Juergen.Zimmermann@h-ka.de" },
+  { name = "Juergen Zimmermann", email = "MaxJagiella@gmail.com" },
 ]
 maintainers = [
-  { name = "Jürgen Zimmermann", email = "Juergen.Zimmermann@h-ka.de" },
+  { name = "Max Jagiella", email = "MaxJagiella@gmail.com" },
 ]
 # https://pypi.org/classifiers
 classifiers = [

@@ -46,7 +46,7 @@ export class PflanzeQuery implements Suchkriterien {
 
     @ApiProperty({ required: false })
     declare readonly typ?: PflanzeTyp;
-    
+
     @ApiProperty({ required: false })
     declare readonly titel?: string;
 
@@ -60,11 +60,9 @@ export class PflanzeQuery implements Suchkriterien {
 @Controller(paths.rest)
 @UseInterceptors(ResponseTimeInterceptor)
 @ApiTags('Pflanze REST-API')
-
 export class PflanzeGetController {
-    
     readonly #service: PflanzeReadService;
-    
+
     readonly #logger = getLogger(PflanzeGetController.name);
 
     constructor(service: PflanzeReadService) {
@@ -181,7 +179,9 @@ export class PflanzeGetController {
         const id = Number(idStr);
         if (!Number.isInteger(id)) {
             this.#logger.debug('getById: not isInteger()');
-            throw new NotFoundException(`Die Pflanzen-ID ${idStr} ist ungueltig.`);
+            throw new NotFoundException(
+                `Die Pflanzen-ID ${idStr} ist ungueltig.`,
+            );
         }
 
         const pflanzeFile = await this.#service.findFileByPflanzeId(id);

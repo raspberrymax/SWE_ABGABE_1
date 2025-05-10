@@ -136,9 +136,7 @@ describe('GET /rest', () => {
         // Jede Pflanze hat den Typ INDOOR
         data.content
             .map((pflanze) => pflanze.typ)
-            .forEach((typ) =>
-                expect(typ).toEqual(typVorhanden),
-            );
+            .forEach((typ) => expect(typ).toEqual(typVorhanden));
     });
 
     test('Mind. 1 Pflanze mit vorhandenem Schlagwort', async () => {

@@ -23,7 +23,10 @@ export class PflanzeDtoOhneRef {
     @IsOptional()
     @ArrayUnique()
     @IsArray()
-    @ApiProperty({ example: ['pflegeleicht', 'schattenliebend'], type: [String] })
+    @ApiProperty({
+        example: ['pflegeleicht', 'schattenliebend'],
+        type: [String],
+    })
     readonly schlagwoerter: string[] | undefined;
 }
 
