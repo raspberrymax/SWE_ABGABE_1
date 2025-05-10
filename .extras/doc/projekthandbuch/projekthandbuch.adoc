@@ -85,7 +85,7 @@ Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
 tempor invidunt ut.
 
 ."PflanzeWriteController" für Schreibzugriffe an der REST-Schnittstelle
-[plantuml,PflanzeWriteController,svg]
+[plantuml,PflanzeGetController,svg]
 ----
 include::PflanzeWriteController.plantuml[]
 ----

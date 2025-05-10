@@ -31,7 +31,7 @@ export class NameExistsException extends HttpException {
 
     constructor(name: string) {
         super(
-            `Die ISBN-Nummer ${name} existiert bereits.`,
+            `Der Name ${name} existiert bereits.`,
             HttpStatus.UNPROCESSABLE_ENTITY,
         );
         this.name = name;

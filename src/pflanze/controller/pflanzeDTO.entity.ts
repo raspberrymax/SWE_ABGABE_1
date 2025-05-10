@@ -4,15 +4,17 @@ import {
     ArrayUnique,
     IsArray,
     IsEnum,
+    IsNotEmpty,
     IsOptional,
     IsString,
     ValidateNested,
 } from 'class-validator';
-import { AbbildungDTO } from './abbildungDTO.entity.js'; // Deine existierende AbbildungDTO
+import { AbbildungDTO } from './abbildungDTO.entity.js';
 import { PflanzeTyp } from '../entity/pflanze.entity.js';
 
 export class PflanzeDtoOhneRef {
     @IsString()
+    @IsNotEmpty({ message: 'name must not be empty' })
     @ApiProperty({ example: 'Photus', type: String })
     readonly name!: string;
 
