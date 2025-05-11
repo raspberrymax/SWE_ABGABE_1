@@ -77,13 +77,19 @@ export class PflanzeWriteController {
             return res.location(location).send();
         } catch (error) {
             this.#logger.error('post: error=%o', error);
-            
-            if (error instanceof Error && error.constructor.name === 'NameExistsException') {
+
+            if (
+                error instanceof Error &&
+                error.constructor.name === 'NameExistsException'
+            ) {
                 return res
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
-                    .json({ message: error.message, statusCode: HttpStatus.UNPROCESSABLE_ENTITY });
+                    .json({
+                        message: error.message,
+                        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+                    });
             }
-            
+
             return res.status(HttpStatus.BAD_REQUEST).send('Fehlerhafte Daten');
         }
     }

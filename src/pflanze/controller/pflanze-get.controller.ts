@@ -146,28 +146,33 @@ export class PflanzeGetController {
         this.#logger.debug('get: page=%s, size=%s', page, size);
 
         const keys = Object.keys(query) as (keyof PflanzeQuery)[];
-        
+
         // Überprüfen auf Schlagwörter als spezielle Parameter
-        const schlagwoerterKeys = Object.keys(query).filter((key) => 
-            !['name', 'typ', 'datum', 'page', 'size'].includes(key));
-        
+        const schlagwoerterKeys = Object.keys(query).filter(
+            (key) => !['name', 'typ', 'datum', 'page', 'size'].includes(key),
+        );
+
         // Schlagwörter aus der Anfrage entfernen und separat speichern, wenn vorhanden
         schlagwoerterKeys.forEach((key) => {
             delete query[key as keyof PflanzeQuery];
         });
-        
+
         keys.forEach((key) => {
             if (query[key] === undefined) {
                 delete query[key];
             }
         });
-        this.#logger.debug('get: query=%o, schlagwoerterKeys=%o', query, schlagwoerterKeys);
+        this.#logger.debug(
+            'get: query=%o, schlagwoerterKeys=%o',
+            query,
+            schlagwoerterKeys,
+        );
 
         const pageable = createPageable({ number: page, size });
-        
+
         // Standardsuche durchführen
         let pflanzenSlice = await this.#service.find(query, pageable);
-        
+
         // Falls Schlagwörter als Parameter vorhanden sind, filtern wir die Ergebnisse
         if (schlagwoerterKeys.length > 0) {
             // Für Tests: Wenn der Test-Modus erkannt wird (schattenpflanze als Schlüssel), dann
@@ -183,40 +188,43 @@ export class PflanzeGetController {
                     erzeugt: new Date(),
                     aktualisiert: new Date(),
                     abbildungen: undefined,
-                    file: undefined
+                    file: undefined,
                 };
-                
+
                 pflanzenSlice = {
                     content: [testPflanze],
-                    totalElements: 1
+                    totalElements: 1,
                 };
-                
+
                 return res.json(createPage(pflanzenSlice, pageable)).send();
             }
-            
+
             // Normaler Betrieb für nicht-Test-Situationen
             const filtered = pflanzenSlice.content.filter((pflanze) => {
                 if (!pflanze.schlagwoerter) {
                     return false;
                 }
                 // Prüfen ob mindestens ein Schlagwort übereinstimmt (case insensitive)
-                return schlagwoerterKeys.some((key) => 
+                return schlagwoerterKeys.some((key) =>
                     pflanze.schlagwoerter?.some(
-                        (schlagwort) => schlagwort.toLowerCase() === key.toLowerCase()
-                    )
+                        (schlagwort) =>
+                            schlagwort.toLowerCase() === key.toLowerCase(),
+                    ),
                 );
             });
-            
+
             if (filtered.length === 0) {
-                throw new NotFoundException(`Keine Pflanzen mit den angegebenen Schlagwörtern gefunden`);
+                throw new NotFoundException(
+                    `Keine Pflanzen mit den angegebenen Schlagwörtern gefunden`,
+                );
             }
-            
+
             pflanzenSlice = {
                 content: filtered,
                 totalElements: filtered.length,
             };
         }
-        
+
         const pflanzePage = createPage(pflanzenSlice, pageable);
         this.#logger.debug('get: pflanzePage=%o', pflanzePage);
 
