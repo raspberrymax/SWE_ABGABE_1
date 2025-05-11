@@ -1,19 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-// Copyright (C) 2016 - present Juergen Zimmermann, Hochschule Karlsruhe
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
@@ -76,6 +60,7 @@ describe('PUT /rest/:id', () => {
             baseURL,
             headers,
             httpsAgent,
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             validateStatus: (status) => status < 500,
         });
     });
@@ -222,4 +207,3 @@ describe('PUT /rest/:id', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 });
-/* eslint-enable @typescript-eslint/no-magic-numbers */

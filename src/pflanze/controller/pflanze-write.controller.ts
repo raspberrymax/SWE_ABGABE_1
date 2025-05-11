@@ -201,9 +201,11 @@ export class PflanzeWriteController {
         description: 'Das Pflanze wurde gelöscht oder war nicht vorhanden',
     })
     @ApiForbiddenResponse({ description: MSG_FORBIDDEN })
-    async delete(@Param('id') id: number) {
+    async delete(@Param('id') id: number, @Res() res: Response) {
         this.#logger.debug('delete: id=%s', id);
-        await this.#service.delete(id);
+        const deleted = await this.#service.delete(id);
+        this.#logger.debug('delete: deleted=%s', deleted);
+        return res.sendStatus(HttpStatus.NO_CONTENT);
     }
 
     #mapPflanzeDtoToEntity(pflanzeDTO: PflanzeDTO): Pflanze {

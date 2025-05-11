@@ -1,0 +1,73 @@
+{
+    "info": {
+        "name": "Pflanze DELETE Requests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Vorhandene Pflanze löschen",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{valid_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/rest/3",
+                    "host": ["{{base_url}}"],
+                    "path": ["rest", "3"]
+                }
+            }
+        },
+        {
+            "name": "Pflanze löschen ohne Token",
+            "request": {
+                "method": "DELETE",
+                "url": {
+                    "raw": "{{base_url}}/rest/3",
+                    "host": ["{{base_url}}"],
+                    "path": ["rest", "3"]
+                }
+            }
+        },
+        {
+            "name": "Pflanze löschen mit falschem Token",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer FALSCH",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/rest/3",
+                    "host": ["{{base_url}}"],
+                    "path": ["rest", "3"]
+                }
+            }
+        },
+        {
+            "name": "Pflanze löschen als Benutzer mit unzureichenden Berechtigungen",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{user_token}}",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/rest/4",
+                    "host": ["{{base_url}}"],
+                    "path": ["rest", "4"]
+                }
+            }
+        }
+    ]
+}

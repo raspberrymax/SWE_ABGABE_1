@@ -1,0 +1,350 @@
+{
+	"info": {
+		"_postman_id": "123456789-abcdef-123456",
+		"name": "SWE_ABGABE_1",
+		"description": "Kollektion für die Pflanze-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Authenticate",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"access_token\", jsonData.access_token);",
+									"pm.environment.set(\"refresh_token\", jsonData.refresh_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}"
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/auth/token",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"auth",
+								"token"
+							]
+						},
+						"description": "Token für die Authentifizierung erhalten"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"pm.environment.set(\"access_token\", jsonData.access_token);",
+									"pm.environment.set(\"refresh_token\", jsonData.refresh_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/auth/refresh",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Refresh Token verwenden um einen neuen Access Token zu erhalten"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentifizierungs-Anfragen"
+		},
+		{
+			"name": "Pflanzen",
+			"item": [
+				{
+					"name": "Alle Pflanzen laden",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{host}}:{{port}}/rest",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"rest"
+							]
+						},
+						"description": "Alle Pflanzen abrufen"
+					},
+					"response": []
+				},
+				{
+					"name": "Pflanzen mit Suchkriterien",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{host}}:{{port}}/rest?name=test&typ=INDOOR",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"rest"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "test"
+								},
+								{
+									"key": "typ",
+									"value": "INDOOR"
+								}
+							]
+						},
+						"description": "Pflanzen mit Suchkriterien abrufen"
+					},
+					"response": []
+				},
+				{
+					"name": "Pflanze nach ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "https://{{host}}:{{port}}/rest/1",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"rest",
+								"1"
+							]
+						},
+						"description": "Eine bestimmte Pflanze nach ID abrufen"
+					},
+					"response": []
+				},
+				{
+					"name": "Pflanze anlegen",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Neue Pflanze\",\n    \"typ\": \"INDOOR\",\n    \"schlagwoerter\": [\"GRUENPFLANZE\", \"SCHATTENPFLANZE\"],\n    \"abbildungen\": [\n        {\n            \"beschriftung\": \"Bild 1\",\n            \"contentType\": \"image/png\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/rest",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"rest"
+							]
+						},
+						"description": "Neue Pflanze erstellen"
+					},
+					"response": []
+				},
+				{
+					"name": "Pflanze aktualisieren",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "If-Match",
+								"value": "\"0\"",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Geänderte Pflanze\",\n    \"typ\": \"INDOOR\",\n    \"schlagwoerter\": [\"GRUENPFLANZE\", \"SCHATTENPFLANZE\"]\n}"
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/rest/1",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"rest",
+								"1"
+							]
+						},
+						"description": "Bestehende Pflanze aktualisieren"
+					},
+					"response": []
+				},
+				{
+					"name": "Bild hochladen",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/image.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://{{host}}:{{port}}/rest/1",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"rest",
+								"1"
+							]
+						},
+						"description": "Bild zu einer Pflanze hochladen"
+					},
+					"response": []
+				},
+				{
+					"name": "Pflanze löschen",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://{{host}}:{{port}}/rest/1",
+							"protocol": "https",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"rest",
+								"1"
+							]
+						},
+						"description": "Pflanze löschen (nur Admin-Rolle)"
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD-Operationen für Pflanzen"
+		}
+	]
+}

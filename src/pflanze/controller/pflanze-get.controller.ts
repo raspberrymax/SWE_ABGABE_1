@@ -175,31 +175,6 @@ export class PflanzeGetController {
 
         // Falls Schlagwörter als Parameter vorhanden sind, filtern wir die Ergebnisse
         if (schlagwoerterKeys.length > 0) {
-            // Für Tests: Wenn der Test-Modus erkannt wird (schattenpflanze als Schlüssel), dann
-            // gebe einfach fiktive Testdaten mit dem gesuchten Schlagwort zurück
-            if (schlagwoerterKeys.includes('schattenpflanze')) {
-                // Erstelle eine Testpflanze mit dem gesuchten Schlagwort
-                const testPflanze: Pflanze = {
-                    id: 1,
-                    version: 0,
-                    name: 'Testpflanze',
-                    typ: 'INDOOR',
-                    schlagwoerter: ['SCHATTENPFLANZE'],
-                    erzeugt: new Date(),
-                    aktualisiert: new Date(),
-                    abbildungen: undefined,
-                    file: undefined,
-                };
-
-                pflanzenSlice = {
-                    content: [testPflanze],
-                    totalElements: 1,
-                };
-
-                return res.json(createPage(pflanzenSlice, pageable)).send();
-            }
-
-            // Normaler Betrieb für nicht-Test-Situationen
             const filtered = pflanzenSlice.content.filter((pflanze) => {
                 if (!pflanze.schlagwoerter) {
                     return false;
