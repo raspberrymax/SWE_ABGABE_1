@@ -24,5 +24,11 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Run Prettier
+      run: npx prettier --check .
+
+    - name: Run ESLint
+      run: npx eslint .
+
     - name: Run tests
       run: npm test
